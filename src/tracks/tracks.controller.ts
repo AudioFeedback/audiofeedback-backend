@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
@@ -20,6 +20,18 @@ export class TracksController {
     return this.tracksService.findAll();
   }
 
+  @Get('audio/:filename')
+  async audio(@Param('filename') filename: string, @Res() res) {
+    const fileStream = await this.tracksService.getAudioFile(filename);
+
+    if (fileStream) {
+      res.setHeader('Content-Type', 'audio/mpeg'); // Adjust content type as needed
+      (await fileStream).pipe(res);
+    } else {
+      res.status(404).send('Audio not found');
+    }
+  }
+
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -35,7 +47,7 @@ export class TracksController {
     },
   })
   upload(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+    return this.tracksService.uploadAudioFile(file);
   }
 
   @Get(':id')
