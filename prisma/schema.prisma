@@ -10,19 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String?
-  posts Post[]
-}
-
-model Post {
+model Track {
   id        Int      @default(autoincrement()) @id
   title     String
-  content   String?
-  test      Int
-  published Boolean? @default(false)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+  genre     String
+  path      String
 }
