@@ -14,5 +14,6 @@ model Track {
   id        Int      @default(autoincrement()) @id
   title     String
   genre     String
-  path      String
+  guid      String
+  filetype  String
 }

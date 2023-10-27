@@ -3,13 +3,33 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { PrismaService } from 'src/prisma.service';
 import { Track, Prisma } from '@prisma/client';
 import { createReadStream, createWriteStream, existsSync } from 'fs';
-import { join } from 'path';
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateTrackDto } from './dto/create-track.dto';
 
 @Injectable()
 export class TracksService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.TrackCreateInput): Promise<Track> {
+  async create(createTrackDto: CreateTrackDto, file: Express.Multer.File): Promise<Track> {
+    const rootDir = process.cwd();
+
+    const ext = path.extname(file.originalname);
+
+    const guid = uuidv4();
+    const filePath = path.join(rootDir, 'audio', `${guid}${ext}`);
+
+    const writeStream = createWriteStream(filePath);
+    writeStream.write(file.buffer);
+    writeStream.end();
+
+    let data = {
+      title: createTrackDto.genre,
+      genre: createTrackDto.genre,
+      guid: guid,
+      filetype: ext
+    }
+
     return this.prisma.track.create({data});
   }
 
@@ -31,22 +51,11 @@ export class TracksService {
 
   async getAudioFile(filename: string) {
     const rootDir = process.cwd();
-    const mp3FilePath = join(rootDir, 'audio', filename);
+    const mp3FilePath = path.join(rootDir, 'audio', filename);
 
     if (existsSync(mp3FilePath)) {
       return createReadStream(mp3FilePath);
     }
     return null;
-  }
-
-  async uploadAudioFile(file: Express.Multer.File): Promise<string> {
-    const rootDir = process.cwd();
-    const filePath = join(rootDir, 'audio', file.originalname);
-
-    const writeStream = createWriteStream(filePath);
-    writeStream.write(file.buffer);
-    writeStream.end();
-
-    return filePath;
   }
 }

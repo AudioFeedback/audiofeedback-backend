@@ -11,8 +11,23 @@ export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        title: {type: 'string'},
+        genre: {type: 'string'},
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   create(@Body() createTrackDto: CreateTrackDto, @UploadedFile() file: Express.Multer.File) {
-    return this.tracksService.create(createTrackDto);
+    return this.tracksService.create(createTrackDto, file);
   }
 
   @Get()
@@ -32,36 +47,18 @@ export class TracksController {
     }
   }
 
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  upload(@UploadedFile() file: Express.Multer.File) {
-    return this.tracksService.uploadAudioFile(file);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.tracksService.findOne(+id);
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tracksService.findOne(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
+  //   return this.tracksService.update(+id, updateTrackDto);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    return this.tracksService.update(+id, updateTrackDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tracksService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.tracksService.remove(+id);
+  // }
 }
