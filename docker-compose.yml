@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     container_name: nest-docker-postgres
     env_file:
-      - .env_docker
+      - docker.env
     environment:
       - PORT=${PORT}
     ports:
