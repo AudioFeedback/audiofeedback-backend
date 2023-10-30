@@ -26,6 +26,7 @@ services:
       - db
     volumes:
       - ./src:/app/src
+      - ./audio:/app/audio
 
   pgadmin:
     image: dpage/pgadmin4
