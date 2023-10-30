@@ -26,7 +26,7 @@ export class TracksService {
     writeStream.end();
 
     const data = {
-      title: createTrackDto.genre,
+      title: createTrackDto.title,
       genre: createTrackDto.genre,
       guid: guid,
       filetype: ext.substring(1),
