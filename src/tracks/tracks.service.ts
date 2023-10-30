@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { Track } from "@prisma/client";
-import { createReadStream, createWriteStream, existsSync } from "fs";
+import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
@@ -54,10 +54,6 @@ export class TracksService {
   async getAudioFile(filename: string) {
     const rootDir = process.cwd();
     const mp3FilePath = path.join(rootDir, "audio", filename);
-
-    if (existsSync(mp3FilePath)) {
-      return createReadStream(mp3FilePath);
-    }
-    return null;
+    return readFileSync(mp3FilePath, null);
   }
 }

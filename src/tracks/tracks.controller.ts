@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Res,
+  Header,
 } from "@nestjs/common";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
@@ -47,15 +48,11 @@ export class TracksController {
   }
 
   @Get("audio/:filename")
+  @Header("Accept-Ranges", "bytes")
   async audio(@Param("filename") filename: string, @Res() res) {
-    const fileStream = await this.tracksService.getAudioFile(filename);
-
-    if (fileStream) {
-      res.setHeader("Content-Type", "audio/mpeg"); // Adjust content type as needed
-      (await fileStream).pipe(res);
-    } else {
-      res.status(404).send("Audio not found");
-    }
+    const file = await this.tracksService.getAudioFile(filename);
+    res.setHeader("Content-Type", "audio/mpeg");
+    await res.end(file);
   }
 
   // @Get(':id')
