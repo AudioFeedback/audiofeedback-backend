@@ -8,11 +8,13 @@ import {
   UploadedFile,
   Res,
   Header,
+  Req,
 } from "@nestjs/common";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { Request } from "express";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -43,8 +45,8 @@ export class TracksController {
   }
 
   @Get()
-  async findAll() {
-    return this.tracksService.findAll();
+  async findAll(@Req() req: Request) {
+    return this.tracksService.findAll(req);
   }
 
   @Get("audio/:filename")

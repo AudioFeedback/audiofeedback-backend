@@ -5,6 +5,8 @@ import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
+import { Request } from "express";
+import { GetTrackDto } from "./dto/get-track.dto";
 
 @Injectable()
 export class TracksService {
@@ -35,8 +37,20 @@ export class TracksService {
     return this.prisma.track.create({ data });
   }
 
-  async findAll(): Promise<Track[]> {
-    return this.prisma.track.findMany();
+  async findAll(req: Request): Promise<GetTrackDto[]> {
+    console.log(req.get("Host"));
+    const tracks = await this.prisma.track.findMany();
+
+    return tracks.map((x) => {
+      return new GetTrackDto(
+        x.id,
+        x.title,
+        x.genre,
+        x.guid,
+        x.filetype,
+        `${req.get("Host")}/tracks/audio/${x.guid}.${x.filetype}`,
+      );
+    });
   }
 
   findOne(id: number) {
