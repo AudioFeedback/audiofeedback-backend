@@ -1,4 +1,4 @@
 export class CreateTrackDto {
-    title: string; 
-    genre: string;
+  title: string;
+  genre: string;
 }

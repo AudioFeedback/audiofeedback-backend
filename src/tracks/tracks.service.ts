@@ -1,36 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { UpdateTrackDto } from './dto/update-track.dto';
-import { PrismaService } from 'src/prisma.service';
-import { Track, Prisma } from '@prisma/client';
-import { createReadStream, createWriteStream, existsSync } from 'fs';
-import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
-import { CreateTrackDto } from './dto/create-track.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "src/prisma.service";
+import { Track } from "@prisma/client";
+import { createReadStream, createWriteStream, existsSync } from "fs";
+import * as path from "path";
+import { v4 as uuidv4 } from "uuid";
+import { CreateTrackDto } from "./dto/create-track.dto";
 
 @Injectable()
 export class TracksService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createTrackDto: CreateTrackDto, file: Express.Multer.File): Promise<Track> {
+  async create(
+    createTrackDto: CreateTrackDto,
+    file: Express.Multer.File,
+  ): Promise<Track> {
     const rootDir = process.cwd();
 
     const ext = path.extname(file.originalname);
 
     const guid = uuidv4();
-    const filePath = path.join(rootDir, 'audio', `${guid}${ext}`);
+    const filePath = path.join(rootDir, "audio", `${guid}${ext}`);
 
     const writeStream = createWriteStream(filePath);
     writeStream.write(file.buffer);
     writeStream.end();
 
-    let data = {
+    const data = {
       title: createTrackDto.genre,
       genre: createTrackDto.genre,
       guid: guid,
-      filetype: ext
-    }
+      filetype: ext.substring(1),
+    };
 
-    return this.prisma.track.create({data});
+    return this.prisma.track.create({ data });
   }
 
   async findAll(): Promise<Track[]> {
@@ -41,7 +43,7 @@ export class TracksService {
     return `This action returns a #${id} track`;
   }
 
-  update(id: number, updateTrackDto: UpdateTrackDto) {
+  update(id: number) {
     return `This action updates a #${id} track`;
   }
 
@@ -51,7 +53,7 @@ export class TracksService {
 
   async getAudioFile(filename: string) {
     const rootDir = process.cwd();
-    const mp3FilePath = path.join(rootDir, 'audio', filename);
+    const mp3FilePath = path.join(rootDir, "audio", filename);
 
     if (existsSync(mp3FilePath)) {
       return createReadStream(mp3FilePath);

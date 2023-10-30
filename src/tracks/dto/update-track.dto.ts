@@ -1,5 +1,5 @@
 export class UpdateTrackDto {
-    title: string; 
-    genre: string;
-    path: string;
+  title: string;
+  genre: string;
+  path: string;
 }
