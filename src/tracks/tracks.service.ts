@@ -38,7 +38,6 @@ export class TracksService {
   }
 
   async findAll(req: Request): Promise<GetTrackDto[]> {
-    console.log(req.get("Host"));
     const tracks = await this.prisma.track.findMany();
 
     return tracks.map((x) => {
