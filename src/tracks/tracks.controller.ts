@@ -15,7 +15,7 @@ import { CreateTrackDto } from "./dto/create-track.dto";
 import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
-import { GetTrackDto } from "./dto/get-track.dto";
+import { GetTrackWithAuthorDto } from "./dto/get-track-with-author.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -31,6 +31,7 @@ export class TracksController {
       properties: {
         title: { type: "string" },
         genre: { type: "string" },
+        authorId: { type: "number" },
         file: {
           type: "string",
           format: "binary",
@@ -45,19 +46,16 @@ export class TracksController {
   ) {
     const track = await this.tracksService.create(createTrackDto, file);
 
-    return new GetTrackDto(
-      track.id,
-      track.title,
-      track.genre,
-      track.guid,
-      track.filetype,
-      `${req.get("Host")}/tracks/audio/${track.guid}.${track.filetype}`,
-    );
+    return new GetTrackWithAuthorDto(track, req);
   }
 
   @Get()
   async findAll(@Req() req: Request) {
-    return this.tracksService.findAll(req);
+    const tracks = await this.tracksService.findAll();
+
+    return tracks.map((x) => {
+      return new GetTrackWithAuthorDto(x, req);
+    });
   }
 
   @Get("audio/:filename")

@@ -16,4 +16,19 @@ model Track {
   genre     String
   guid      String
   filetype  String
+  authorId  Int
+  author    User @relation(fields: [authorId], references: [id])
+}
+
+model User {
+  id        Int      @default(autoincrement()) @id
+  firstname String
+  lastname  String
+  role      Role
+  tracks    Track[]
+}
+
+enum Role {
+  FEEDBACKGEVER
+  MUZIEKPRODUCER
 }
