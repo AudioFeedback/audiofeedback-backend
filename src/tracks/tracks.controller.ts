@@ -15,6 +15,7 @@ import { CreateTrackDto } from "./dto/create-track.dto";
 import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
+import { GetTrackDto } from "./dto/get-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -37,11 +38,21 @@ export class TracksController {
       },
     },
   })
-  create(
+  async create(
     @Body() createTrackDto: CreateTrackDto,
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
   ) {
-    return this.tracksService.create(createTrackDto, file);
+    const track = await this.tracksService.create(createTrackDto, file);
+
+    return new GetTrackDto(
+      track.id,
+      track.title,
+      track.genre,
+      track.guid,
+      track.filetype,
+      `${req.get("Host")}/tracks/audio/${track.guid}.${track.filetype}`,
+    );
   }
 
   @Get()
