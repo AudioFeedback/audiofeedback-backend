@@ -1,5 +1,5 @@
 export class CreateFeedbackDto {
-    rating: String;
-    timestamp: number;
-    trackId: number;
+  rating: string;
+  timestamp: number;
+  trackId: number;
 }

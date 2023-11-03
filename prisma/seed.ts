@@ -6,18 +6,35 @@ const prisma = new PrismaClient()
 
 async function main() {
   const musicProducer1 = await createRandomUser(Role.MUZIEKPRODUCER);
-  await addTrackToMusicProducer(musicProducer1, PhonHouseBeat);
-  await addTrackToMusicProducer(musicProducer1, WatrByYourSide);
-  await addTrackToMusicProducer(musicProducer1, FuturisticBeat);
+
+  const PhonHouseBeatTrack = await addTrackToMusicProducer(musicProducer1, PhonHouseBeat);
+  const WatrByYourSideTrack = await addTrackToMusicProducer(musicProducer1, WatrByYourSide);
+  const FuturisticBeatTrack = await addTrackToMusicProducer(musicProducer1, FuturisticBeat);
 
   const musicroducer2 = await createRandomUser(Role.MUZIEKPRODUCER);
-  await addTrackToMusicProducer(musicroducer2, Embrace);
-  await addTrackToMusicProducer(musicroducer2, ModernVlog);
+
+  const EmbraceTrack = await addTrackToMusicProducer(musicroducer2, Embrace);
+  const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog);
 
 
   const feedbackgever1 = await createRandomUser(Role.FEEDBACKGEVER);
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever1)
+
   const feedbackgever2= await createRandomUser(Role.FEEDBACKGEVER);
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever2)
+
+
   const feedbackgever3 = await createRandomUser(Role.FEEDBACKGEVER);
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), ModernVlogTrack, feedbackgever3)
 }
 
 
@@ -36,7 +53,7 @@ function createRandomUser(role?: Role): Promise<User> {
 function createRandomFeedback(): FeedbackData {
   return {
     rating: fakerNL.datatype.boolean(),
-    comment: fakerNL.lorem.lines({min: 1, max: 5}),
+    comment: fakerNL.lorem.lines({min: 1, max: 1}),
     timestamp: fakerNL.number.float({ precision: 0.1, max: 1 })
   }
 }
@@ -52,7 +69,7 @@ function addTrackToMusicProducer(user: User, track: TrackData) {
   })
 }
 
-function addFeedbackToTrack(feedback: FeedbackData, track: Track, user: User, feedback2: Feedback) {
+function addFeedbackToTrack(feedback: FeedbackData, track: Track, user: User) {
   return prisma.feedback.create({
     data: {
       ...feedback,

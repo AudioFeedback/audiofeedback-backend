@@ -16,6 +16,7 @@ export class UsersService {
     return this.prisma.user.findMany({
       include: {
         tracks: true,
+        feedback: true,
       },
     });
   }
