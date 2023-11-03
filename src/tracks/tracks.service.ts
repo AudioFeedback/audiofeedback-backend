@@ -1,12 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { Track } from "@prisma/client";
 import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
-import { Request } from "express";
-import { GetTrackDto } from "./dto/get-track.dto";
+import { TrackWithAuthor } from "./dto/get-track-with-author.dto";
 
 @Injectable()
 export class TracksService {
@@ -15,7 +13,7 @@ export class TracksService {
   async create(
     createTrackDto: CreateTrackDto,
     file: Express.Multer.File,
-  ): Promise<Track> {
+  ): Promise<TrackWithAuthor> {
     const rootDir = process.cwd();
 
     const ext = path.extname(file.originalname);
@@ -27,28 +25,27 @@ export class TracksService {
     writeStream.write(file.buffer);
     writeStream.end();
 
-    const data = {
-      title: createTrackDto.title,
-      genre: createTrackDto.genre,
-      guid: guid,
-      filetype: ext.substring(1),
-    };
-
-    return this.prisma.track.create({ data });
+    return await this.prisma.track.create({
+      data: {
+        title: createTrackDto.title,
+        guid: guid,
+        genre: createTrackDto.genre,
+        author: {
+          connect: { id: Number(createTrackDto.authorId) },
+        },
+        filetype: ext.substring(1),
+      },
+      include: {
+        author: true,
+      },
+    });
   }
 
-  async findAll(req: Request): Promise<GetTrackDto[]> {
-    const tracks = await this.prisma.track.findMany();
-
-    return tracks.map((x) => {
-      return new GetTrackDto(
-        x.id,
-        x.title,
-        x.genre,
-        x.guid,
-        x.filetype,
-        `${req.get("Host")}/tracks/audio/${x.guid}.${x.filetype}`,
-      );
+  async findAll(): Promise<TrackWithAuthor[]> {
+    return this.prisma.track.findMany({
+      include: {
+        author: true,
+      },
     });
   }
 
