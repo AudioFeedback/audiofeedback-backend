@@ -17,10 +17,10 @@ import { ApiTags } from "@nestjs/swagger";
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
-  @Post()
-  create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbackService.create(createFeedbackDto);
-  }
+  // @Post()
+  // create(@Body() createFeedbackDto: CreateFeedbackDto) {
+  //   return this.feedbackService.create(createFeedbackDto);
+  // }
 
   @Get()
   findAll() {
@@ -32,13 +32,13 @@ export class FeedbackController {
     return this.feedbackService.findOne(+id);
   }
 
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateFeedbackDto: UpdateFeedbackDto,
-  ) {
-    return this.feedbackService.update(+id, updateFeedbackDto);
-  }
+  // @Patch(":id")
+  // update(
+  //   @Param("id") id: string,
+  //   @Body() updateFeedbackDto: UpdateFeedbackDto,
+  // ) {
+  //   return this.feedbackService.update(+id, updateFeedbackDto);
+  // }
 
   @Delete(":id")
   remove(@Param("id") id: string) {
