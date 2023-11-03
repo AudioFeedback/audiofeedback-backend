@@ -1,5 +1,6 @@
-import { PrismaClient, Role, User } from '@prisma/client'
+import { Feedback, PrismaClient, Role, Track, User } from '@prisma/client'
 import { faker, fakerNL } from '@faker-js/faker';
+import { CreateFeedbackDto } from 'src/feedback/dto/create-feedback.dto';
 
 const prisma = new PrismaClient()
 
@@ -32,6 +33,14 @@ function createRandomUser(role?: Role): Promise<User> {
   return prisma.user.create({data});
 }
 
+function createRandomFeedback(): FeedbackData {
+  return {
+    rating: fakerNL.datatype.boolean(),
+    comment: fakerNL.lorem.lines({min: 1, max: 5}),
+    timestamp: fakerNL.number.float({ precision: 0.1, max: 1 })
+  }
+}
+
 function addTrackToMusicProducer(user: User, track: TrackData) {
   return prisma.track.create({
     data: {
@@ -43,11 +52,31 @@ function addTrackToMusicProducer(user: User, track: TrackData) {
   })
 }
 
+function addFeedbackToTrack(feedback: FeedbackData, track: Track, user: User, feedback2: Feedback) {
+  return prisma.feedback.create({
+    data: {
+      ...feedback,
+      track: {
+        connect: track
+      },
+      user: {
+        connect: user
+      }
+    }
+  })
+}
+
 interface TrackData {
-  title: string,
-  genre: string,
-  guid: string,
-  filetype: string
+  title: string;
+  genre: string;
+  guid: string;
+  filetype: string;
+}
+
+interface FeedbackData {
+  rating: boolean;
+  comment: string;
+  timestamp: number;
 }
 
 // Zie folder discord, importeer deze in de folder /audio
