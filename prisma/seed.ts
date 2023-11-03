@@ -22,9 +22,11 @@ async function main() {
 
 function createRandomUser(role?: Role): Promise<User> {
   const data = {
+    username: fakerNL.internet.userName(),
     firstname: fakerNL.person.firstName(),
+    password: fakerNL.internet.password(),
     lastname: fakerNL.person.lastName(),
-    role: role ? role : faker.helpers.enumValue(Role)
+    role: role ? role : faker.helpers.enumValue(Role),
   }
 
   return prisma.user.create({data});

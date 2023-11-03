@@ -11,21 +11,33 @@ datasource db {
 }
 
 model Track {
-  id        Int      @default(autoincrement()) @id
-  title     String
-  genre     String
-  guid      String
-  filetype  String
-  authorId  Int
-  author    User @relation(fields: [authorId], references: [id])
+  id       Int        @id @default(autoincrement())
+  title    String
+  genre    String
+  guid     String
+  filetype String
+  authorId Int
+  author   User       @relation(fields: [authorId], references: [id])
+  feedback Feedback[]
 }
 
 model User {
-  id        Int      @default(autoincrement()) @id
+  id        Int        @id @default(autoincrement())
+  username  String
   firstname String
   lastname  String
+  password  String
   role      Role
   tracks    Track[]
+  feedback  Feedback[]
+}
+
+model Feedback {
+  id      Int   @id @default(autoincrement())
+  userId  Int
+  trackId Int
+  user    User  @relation(fields: [userId], references: [id])
+  track   Track @relation(fields: [trackId], references: [id])
 }
 
 enum Role {

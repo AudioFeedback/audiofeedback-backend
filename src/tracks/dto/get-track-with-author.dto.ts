@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { GetUserWithTrackDto } from "src/users/dto/get-user-with-track.dto";
 import { Request } from "express";
+import { GetUserDto } from "src/users/dto/get-user.dto";
 
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: { author: true },
@@ -15,7 +15,7 @@ export class GetTrackWithAuthorDto {
   guid: string;
   filetype: string;
   full_url: string;
-  author: GetUserWithTrackDto;
+  author: GetUserDto;
 
   constructor(track: TrackWithAuthor, req: Request) {
     this.id = track.id;
@@ -26,6 +26,6 @@ export class GetTrackWithAuthorDto {
     this.full_url = `${req.get("Host")}/tracks/audio/${track.guid}.${
       track.filetype
     }`;
-    this.author = track.author;
+    this.author = new GetUserDto(track.author);
   }
 }
