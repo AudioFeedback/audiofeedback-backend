@@ -4,6 +4,7 @@ import { LocalAuthGuard } from "./auth/local-auth.guard";
 import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { UsersService } from "./users/users.service";
+import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
 
 @Controller()
 export class AppController {
@@ -18,12 +19,23 @@ export class AppController {
   }
 
   @UseGuards(LocalAuthGuard)
+  @ApiConsumes("application/json")
   @Post("auth/login")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        username: { type: "string" },
+        password: { type: "string" },
+      },
+    },
+  })
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Get("profile")
   getProfile(@Request() req) {
     return this.userService.findOne({ username: req.user.username });
