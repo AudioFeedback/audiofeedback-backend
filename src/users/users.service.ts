@@ -23,10 +23,7 @@ export class UsersService {
 
   async findOne(userWhereInput: Prisma.UserWhereUniqueInput) {
     return this.prisma.user.findUnique({
-      where: userWhereInput,
-      include: {
-        tracks: true,
-      },
+      where: userWhereInput
     });
   }
 

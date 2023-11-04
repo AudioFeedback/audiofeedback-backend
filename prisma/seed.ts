@@ -42,7 +42,7 @@ function createRandomUser(role?: Role): Promise<User> {
   const data = {
     username: fakerNL.internet.userName(),
     firstname: fakerNL.person.firstName(),
-    password: fakerNL.internet.password(),
+    password: "demo123",
     lastname: fakerNL.person.lastName(),
     role: role ? role : faker.helpers.enumValue(Role),
   }
