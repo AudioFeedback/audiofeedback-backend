@@ -27,7 +27,7 @@ model User {
   firstname String
   lastname  String
   password  String
-  role      Role[]
+  roles      Role[]
   tracks    Track[]
   feedback  Feedback[]
 }

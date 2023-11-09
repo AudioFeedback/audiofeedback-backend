@@ -4,31 +4,35 @@ import { fakerNL } from '@faker-js/faker';
 const prisma = new PrismaClient()
 
 async function main() {
-  const musicProducer1 = await createRandomUser(Role.MUZIEKPRODUCER, "muziekproducer");
+  const superUser = await createRandomUser([Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN], "superuser");
+
+  const admin = await createRandomUser([Role.ADMIN], "admin");
+
+  const musicProducer1 = await createRandomUser([Role.MUZIEKPRODUCER], "muziekproducer");
 
   const PhonHouseBeatTrack = await addTrackToMusicProducer(musicProducer1, PhonHouseBeat);
   const WatrByYourSideTrack = await addTrackToMusicProducer(musicProducer1, WatrByYourSide);
   const FuturisticBeatTrack = await addTrackToMusicProducer(musicProducer1, FuturisticBeat);
 
-  const musicroducer2 = await createRandomUser(Role.MUZIEKPRODUCER);
+  const musicroducer2 = await createRandomUser([Role.MUZIEKPRODUCER]);
 
   const EmbraceTrack = await addTrackToMusicProducer(musicroducer2, Embrace);
   const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog);
 
 
-  const feedbackgever1 = await createRandomUser(Role.FEEDBACKGEVER, "feedbackgever");
+  const feedbackgever1 = await createRandomUser([Role.FEEDBACKGEVER], "feedbackgever");
   await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever1)
 
-  const feedbackgever2= await createRandomUser(Role.FEEDBACKGEVER);
+  const feedbackgever2= await createRandomUser([Role.FEEDBACKGEVER]);
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever2)
   await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever2)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever2)
 
 
-  const feedbackgever3 = await createRandomUser(Role.FEEDBACKGEVER);
+  const feedbackgever3 = await createRandomUser([Role.FEEDBACKGEVER]);
   await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever3)
@@ -37,13 +41,13 @@ async function main() {
 }
 
 
-function createRandomUser(role: Role, username?: string): Promise<User> {
+function createRandomUser(roles: Role[], username?: string): Promise<User> {
   const data = {
     username: username ? username : fakerNL.internet.userName(),
     firstname: fakerNL.person.firstName(),
     password: "demo123",
     lastname: fakerNL.person.lastName(),
-    role: [role],
+    roles: roles,
   }
 
   return prisma.user.create({data});

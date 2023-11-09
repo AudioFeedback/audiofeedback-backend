@@ -13,14 +13,14 @@ export class GetUserWithTrackDto {
   id: number;
   firstname: string;
   lastname: string;
-  role: Role[];
+  roles: Role[];
   tracks?: GetTrackDto[];
   feedback?: GetFeedbackDto[];
 
   constructor(user: UserWithTrack, req: Request) {
     this.id = user.id;
     this.firstname = user.firstname;
-    this.role = user.role;
+    this.roles = user.roles;
     this.tracks = user.tracks.map((x) => {
       return new GetTrackDto(x, req);
     });

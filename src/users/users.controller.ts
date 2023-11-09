@@ -7,27 +7,35 @@ import {
   Param,
   Delete,
   Req,
+  UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { ApiTags } from "@nestjs/swagger";
-import { User } from "@prisma/client";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Role, User } from "@prisma/client";
 import { GetUserWithTrackDto } from "./dto/get-user-with-track.dto";
 import { GetTrackDto } from "src/tracks/dto/get-track.dto";
 import { Request } from "express";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { RolesGuard } from "src/auth/roles.guard";
+import { Roles } from "src/auth/roles.decorator";
 
 @ApiTags("users")
 @Controller("users")
+@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   async findAll(@Req() req: Request): Promise<GetUserWithTrackDto[]> {
     const users = await this.usersService.findAll();
     return users.map((x) => {
@@ -41,16 +49,19 @@ export class UsersController {
   }
 
   @Get(":id")
+  @Roles(Role.ADMIN)
   findOne(@Param("id") id: string): Promise<User> {
     return this.usersService.findOne({ id: Number(id) });
   }
 
   @Patch(":id")
+  @Roles(Role.ADMIN)
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(":id")
+  @Roles(Role.ADMIN)
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }

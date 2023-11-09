@@ -5,13 +5,13 @@ export class GetUserDto {
   username: string;
   firstname: string;
   lastname: string;
-  role: Role[];
+  roles: Role[];
 
   constructor(user: User) {
     this.id = user.id;
     this.username = user.username;
     this.firstname = user.firstname;
     this.lastname = user.lastname;
-    this.role = user.role;
+    this.roles = user.roles;
   }
 }
