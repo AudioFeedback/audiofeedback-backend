@@ -21,6 +21,7 @@ import { Role } from "@prisma/client";
 import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/roles.guard";
+import { GetTrackWithAuthorAndFeedbackDto } from "./dto/get-track-with-autor-and-feedback";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -60,10 +61,10 @@ export class TracksController {
   @Get()
   @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN)
   async findAll(@Req() req: Request) {
-    const tracks = await this.tracksService.findAll();
+    const tracks = await this.tracksService.findAll(req);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorDto(x, req);
+      return new GetTrackWithAuthorAndFeedbackDto(x, req);
     });
   }
 
