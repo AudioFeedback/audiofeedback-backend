@@ -8,8 +8,6 @@ import {
   Delete,
 } from "@nestjs/common";
 import { FeedbackService } from "./feedback.service";
-// import { CreateFeedbackDto } from "./dto/create-feedback.dto";
-// import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
 import { ApiTags } from "@nestjs/swagger";
 
 @ApiTags("feedback")
@@ -23,8 +21,8 @@ export class FeedbackController {
   // }
 
   @Get()
-  findAll() {
-    return this.feedbackService.findAll();
+  async findAll() {
+    return await this.feedbackService.findAll();
   }
 
   @Get(":id")
