@@ -16,6 +16,7 @@ export class TracksService {
   async create(
     createTrackDto: CreateTrackDto,
     file: Express.Multer.File,
+    user: User
   ): Promise<TrackWithAuthor> {
     const rootDir = process.cwd();
 
@@ -34,7 +35,7 @@ export class TracksService {
         guid: guid,
         genre: createTrackDto.genre,
         author: {
-          connect: { id: Number(createTrackDto.authorId) },
+          connect: { id: Number(user.id) },
         },
         filetype: ext.substring(1),
       },
@@ -44,16 +45,15 @@ export class TracksService {
     });
   }
 
-  async findAll(@Req() req: Request): Promise<TrackWithAuthorAndFeedback[]> {
-    const { user } = req;
+  async findAll(user: User): Promise<TrackWithAuthorAndFeedback[]> {
     return this.prisma.track.findMany({
       where: {
         OR: [
-          { authorId: (<User>user).id },
+          { authorId: user.id },
           {
             feedback: {
               some: {
-                userId: (<User>user).id,
+                userId: user.id,
               },
             },
           },
@@ -63,7 +63,7 @@ export class TracksService {
         author: true,
         feedback: {
           where: {
-            userId: (<User>user).id,
+            userId: user.id,
           },
         },
       },

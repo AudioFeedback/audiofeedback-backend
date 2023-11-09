@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
 import { GetTrackWithAuthorDto } from "./dto/get-track-with-author.dto";
-import { Role } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/roles.guard";
@@ -40,7 +40,6 @@ export class TracksController {
       properties: {
         title: { type: "string" },
         genre: { type: "string" },
-        authorId: { type: "number" },
         file: {
           type: "string",
           format: "binary",
@@ -53,7 +52,7 @@ export class TracksController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    const track = await this.tracksService.create(createTrackDto, file);
+    const track = await this.tracksService.create(createTrackDto, file, (<User>req.user));
 
     return new GetTrackWithAuthorDto(track, req);
   }
@@ -61,7 +60,7 @@ export class TracksController {
   @Get()
   @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN)
   async findAll(@Req() req: Request) {
-    const tracks = await this.tracksService.findAll(req);
+    const tracks = await this.tracksService.findAll(<User>req.user);
 
     return tracks.map((x) => {
       return new GetTrackWithAuthorAndFeedbackDto(x, req);
