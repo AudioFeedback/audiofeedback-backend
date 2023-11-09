@@ -5,7 +5,7 @@ export class GetUserDto {
   username: string;
   firstname: string;
   lastname: string;
-  role: Role;
+  role: Role[];
 
   constructor(user: User) {
     this.id = user.id;

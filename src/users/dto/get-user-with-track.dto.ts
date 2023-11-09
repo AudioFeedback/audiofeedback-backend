@@ -13,7 +13,7 @@ export class GetUserWithTrackDto {
   id: number;
   firstname: string;
   lastname: string;
-  role: Role;
+  role: Role[];
   tracks?: GetTrackDto[];
   feedback?: GetFeedbackDto[];
 

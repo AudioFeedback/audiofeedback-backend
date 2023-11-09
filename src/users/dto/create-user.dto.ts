@@ -11,5 +11,5 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastname: string;
   @IsNotEmpty()
-  role: Role;
+  role: Role[];
 }

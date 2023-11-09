@@ -43,7 +43,7 @@ function createRandomUser(role: Role, username?: string): Promise<User> {
     firstname: fakerNL.person.firstName(),
     password: "demo123",
     lastname: fakerNL.person.lastName(),
-    role: role,
+    role: [role],
   }
 
   return prisma.user.create({data});
@@ -62,7 +62,7 @@ function addTrackToMusicProducer(user: User, track: TrackData) {
     data: {
       ...track,
       author: {
-        connect: user
+        connect: {username: user.username}
       }
     }
   })
@@ -76,7 +76,7 @@ function addFeedbackToTrack(feedback: FeedbackData, track: Track, user: User) {
         connect: track
       },
       user: {
-        connect: user
+        connect: {username: user.username}
       }
     }
   })
