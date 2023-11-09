@@ -9,13 +9,19 @@ import {
   Res,
   Header,
   Req,
+  UseGuards,
 } from "@nestjs/common";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
-import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
 import { GetTrackWithAuthorDto } from "./dto/get-track-with-author.dto";
+import { Role, User } from "@prisma/client";
+import { Roles } from "src/auth/roles.decorator";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { RolesGuard } from "src/auth/roles.guard";
+import { GetTrackWithAuthorAndFeedbackDto } from "./dto/get-track-with-autor-and-feedback";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -23,6 +29,9 @@ export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Post()
+  @Roles(Role.MUZIEKPRODUCER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor("file"))
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -31,7 +40,6 @@ export class TracksController {
       properties: {
         title: { type: "string" },
         genre: { type: "string" },
-        authorId: { type: "number" },
         file: {
           type: "string",
           format: "binary",
@@ -44,17 +52,20 @@ export class TracksController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    const track = await this.tracksService.create(createTrackDto, file);
+    const track = await this.tracksService.create(createTrackDto, file, (<User>req.user));
 
     return new GetTrackWithAuthorDto(track, req);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN)
   async findAll(@Req() req: Request) {
-    const tracks = await this.tracksService.findAll();
+    const tracks = await this.tracksService.findAll(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorDto(x, req);
+      return new GetTrackWithAuthorAndFeedbackDto(x, req);
     });
   }
 

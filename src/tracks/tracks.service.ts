@@ -1,10 +1,13 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Req } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { TrackWithAuthor } from "./dto/get-track-with-author.dto";
+import { Request } from "express";
+import { User } from "@prisma/client";
+import { TrackWithAuthorAndFeedback } from "./dto/get-track-with-autor-and-feedback";
 
 @Injectable()
 export class TracksService {
@@ -13,6 +16,7 @@ export class TracksService {
   async create(
     createTrackDto: CreateTrackDto,
     file: Express.Multer.File,
+    user: User
   ): Promise<TrackWithAuthor> {
     const rootDir = process.cwd();
 
@@ -31,7 +35,7 @@ export class TracksService {
         guid: guid,
         genre: createTrackDto.genre,
         author: {
-          connect: { id: Number(createTrackDto.authorId) },
+          connect: { id: Number(user.id) },
         },
         filetype: ext.substring(1),
       },
@@ -41,10 +45,27 @@ export class TracksService {
     });
   }
 
-  async findAll(): Promise<TrackWithAuthor[]> {
+  async findAll(user: User): Promise<TrackWithAuthorAndFeedback[]> {
     return this.prisma.track.findMany({
+      where: {
+        OR: [
+          { authorId: user.id },
+          {
+            feedback: {
+              some: {
+                userId: user.id,
+              },
+            },
+          },
+        ],
+      },
       include: {
         author: true,
+        feedback: {
+          where: {
+            userId: user.id,
+          },
+        },
       },
     });
   }

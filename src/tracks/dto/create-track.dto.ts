@@ -5,6 +5,4 @@ export class CreateTrackDto {
   title: string;
   @IsNotEmpty()
   genre: string;
-  @IsNotEmpty()
-  authorId: number;
 }
