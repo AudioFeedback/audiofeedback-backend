@@ -25,13 +25,13 @@ import { GetTrackWithAuthorAndFeedbackDto } from "./dto/get-track-with-autor-and
 
 @ApiTags("tracks")
 @Controller("tracks")
-@UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
 export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor("file"))
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -58,6 +58,8 @@ export class TracksController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN)
   async findAll(@Req() req: Request) {
     const tracks = await this.tracksService.findAll(<User>req.user);
@@ -68,7 +70,6 @@ export class TracksController {
   }
 
   @Get("audio/:filename")
-  @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN)
   @Header("Accept-Ranges", "bytes")
   async audio(@Param("filename") filename: string, @Res() res) {
     const file = await this.tracksService.getAudioFile(filename);
