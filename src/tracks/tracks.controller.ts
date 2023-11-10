@@ -109,10 +109,10 @@ export class TracksController {
     await res.end(file);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.tracksService.findOne(+id);
-  // }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.tracksService.findOneDeep(+id);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {

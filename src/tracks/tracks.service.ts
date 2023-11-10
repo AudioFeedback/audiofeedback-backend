@@ -62,6 +62,23 @@ export class TracksService {
     });
   }
 
+  findOneDeep(id: number) {
+    return this.prisma.track.findUnique({
+      where: { id: id },
+      include: {
+        trackVersions: {
+          include: {
+            feedback: {
+              include: {
+                user: true
+              }
+            }
+          }
+        },
+      }
+    });
+  }
+
   update(id: number) {
     return `This action updates a #${id} track`;
   }
