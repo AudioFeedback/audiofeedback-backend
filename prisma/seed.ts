@@ -1,4 +1,4 @@
-import { PrismaClient, Role, Track, User } from '@prisma/client'
+import { PrismaClient, Role, Track, TrackVersion, User } from '@prisma/client'
 import { fakerNL } from '@faker-js/faker';
 
 const prisma = new PrismaClient()
@@ -57,22 +57,38 @@ function createRandomFeedback(): FeedbackData {
   return {
     rating: fakerNL.datatype.boolean(),
     comment: fakerNL.lorem.lines({min: 1, max: 1}),
-    timestamp: fakerNL.number.float({ precision: 0.1, max: 1 })
   }
 }
 
-function addTrackToMusicProducer(user: User, track: TrackData) {
-  return prisma.track.create({
+async function addTrackToMusicProducer(user: User, trackData: TrackData) {
+
+  const {title, genre, versionNumber, description, guid, filetype} = trackData;
+
+  const track = await prisma.track.create({
     data: {
-      ...track,
+      title: title,
+      genre: genre,
       author: {
         connect: {username: user.username}
       }
     }
   })
+
+  const firstTrackVersion = await prisma.trackVersion.create({
+    data: {
+      versionNumber: versionNumber,
+      description: description,
+      guid: guid,
+      filetype: filetype,
+      track: {
+        connect: track
+      }
+    }
+  })
+  return firstTrackVersion;
 }
 
-function addFeedbackToTrack(feedback: FeedbackData, track: Track, user: User) {
+function addFeedbackToTrack(feedback: FeedbackData, track: TrackVersion, user: User) {
   return prisma.feedback.create({
     data: {
       ...feedback,
@@ -89,6 +105,8 @@ function addFeedbackToTrack(feedback: FeedbackData, track: Track, user: User) {
 interface TrackData {
   title: string;
   genre: string;
+  versionNumber: number;
+  description: string;
   guid: string;
   filetype: string;
 }
@@ -96,44 +114,53 @@ interface TrackData {
 interface FeedbackData {
   rating: boolean;
   comment: string;
-  timestamp: number;
 }
 
 // Zie folder discord, importeer deze in de folder /audio
 
-const PhonHouseBeat = {
+const PhonHouseBeat: TrackData = {
   title: "Phonk House Beat (You Wanna Play)",
   genre: "Fonk",
   guid: "phonk-house-beat-you-wanna-play-126321",
   filetype: "mp3",
+  versionNumber: 1,
+  description: "Eerste versie van de track.",
 }
 
-const WatrByYourSide = {
+const WatrByYourSide: TrackData = {
   title: "WatR. - By Your Side",
   genre: "House",
   guid: "watr-by-your-side-11516",
   filetype: "mp3",
+  versionNumber: 1,
+  description: "Eerste versie van de track.",
 }
 
-const FuturisticBeat = {
+const FuturisticBeat: TrackData = {
   title: "Futuristic Beat",
   genre: "Trap",
   guid: "futuristic-beat-146661",
   filetype: "mp3",
+  versionNumber: 1,
+  description: "Eerste versie van de track.",
 }
 
-const Embrace = {
+const Embrace: TrackData = {
   title: "Embrace",
   genre: "Uplifting",
   guid: "embrace-12278",
   filetype: "mp3",
+  versionNumber: 1,
+  description: "Eerste versie van de track.",
 }
 
-const ModernVlog = {
+const ModernVlog: TrackData = {
   title: "Modern Vlog",
   genre: "Future Bass",
   guid: "modern-vlog-140795",
   filetype: "mp3",
+  versionNumber: 1,
+  description: "Eerste versie van de track.",
 }
 
 main()

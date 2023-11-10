@@ -1,5 +1,10 @@
+import { IsNotEmpty } from "class-validator";
+
 export class CreateFeedbackDto {
-  rating: string;
-  timestamp: number;
+  @IsNotEmpty()
+  rating: boolean;
+  @IsNotEmpty()
+  comment: string;
+  @IsNotEmpty()
   trackId: number;
 }

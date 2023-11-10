@@ -13,10 +13,5 @@ export class GetTrackDto {
     this.id = track.id;
     this.title = track.title;
     this.genre = track.genre;
-    this.guid = track.guid;
-    this.filetype = track.filetype;
-    this.full_url = `${req.get("Host")}/tracks/audio/${track.guid}.${
-      track.filetype
-    }`;
   }
 }
