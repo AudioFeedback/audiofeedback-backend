@@ -28,6 +28,7 @@ import {
   TrackVersionsService,
 } from "./trackversions.service";
 import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
+import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -109,9 +110,13 @@ export class TracksController {
     await res.end(file);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tracksService.findOneDeep(+id);
+  @Get(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  async findOne(@Param("id") id: string, @Req() req: Request) {
+    const track = await this.tracksService.findOneDeep(+id);
+    return new GetTrackDeepDto(track, req);
   }
 
   // @Patch(':id')

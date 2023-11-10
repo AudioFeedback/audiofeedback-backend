@@ -42,7 +42,7 @@ export class UsersController {
       return {
         ...x,
         tracks: x.tracks.map((y) => {
-          return new GetTrackDto(y, req);
+          return new GetTrackDto(y);
         }),
       };
     });

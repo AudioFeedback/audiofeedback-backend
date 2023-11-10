@@ -22,7 +22,7 @@ export class GetUserWithTrackDto {
     this.firstname = user.firstname;
     this.roles = user.roles;
     this.tracks = user.tracks.map((x) => {
-      return new GetTrackDto(x, req);
+      return new GetTrackDto(x);
     });
     this.feedback = user.feedback.map((x) => {
       return new GetFeedbackDto(x);

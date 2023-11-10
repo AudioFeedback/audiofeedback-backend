@@ -85,6 +85,19 @@ async function addTrackToMusicProducer(user: User, trackData: TrackData) {
       }
     }
   })
+
+  await prisma.trackVersion.create({
+    data: {
+      versionNumber: 2,
+      description: "Tweede versie is de beste versie",
+      guid: guid,
+      filetype: filetype,
+      track: {
+        connect: track
+      }
+    }
+  })
+  
   return firstTrackVersion;
 }
 

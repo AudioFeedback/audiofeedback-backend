@@ -1,4 +1,4 @@
-import { Prisma, Track, TrackVersion } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { Request } from "express";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 import { GetTrackVersionDto } from "./get-trackversion.dto";

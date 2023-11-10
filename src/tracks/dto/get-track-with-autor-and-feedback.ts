@@ -1,5 +1,4 @@
 import { Prisma, TrackVersion } from "@prisma/client";
-import { Request } from "express";
 import { GetFeedbackDto } from "src/feedback/dto/get-feedback.dto";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 
@@ -22,7 +21,7 @@ export class GetTrackWithAuthorAndFeedbackDto {
   trackVersions: TrackVersion[];
   feedback: GetFeedbackDto[];
 
-  constructor(track: TrackWithAuthorAndFeedback, req: Request) {
+  constructor(track: TrackWithAuthorAndFeedback) {
     this.id = track.id;
     this.title = track.title;
     this.genre = track.genre;

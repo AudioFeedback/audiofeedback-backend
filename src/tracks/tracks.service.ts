@@ -70,12 +70,12 @@ export class TracksService {
           include: {
             feedback: {
               include: {
-                user: true
-              }
-            }
-          }
+                user: true,
+              },
+            },
+          },
         },
-      }
+      },
     });
   }
 
