@@ -52,7 +52,11 @@ export class TracksController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    const track = await this.tracksService.create(createTrackDto, file, (<User>req.user));
+    const track = await this.tracksService.create(
+      createTrackDto,
+      file,
+      <User>req.user,
+    );
 
     return new GetTrackWithAuthorDto(track, req);
   }

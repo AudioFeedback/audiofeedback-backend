@@ -15,4 +15,12 @@ export class GetFeedbackWithUserDto {
   comment: string;
   timestamp: number;
   user: GetUserDto;
+
+  constructor(feedback: FeedbackWithUser) {
+    this.id = feedback.id;
+    this.rating = feedback.rating;
+    this.comment = feedback.comment;
+    this.timestamp = feedback.timestamp;
+    this.user = feedback.user;
+  }
 }

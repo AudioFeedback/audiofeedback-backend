@@ -1,11 +1,10 @@
-import { Injectable, Req } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { TrackWithAuthor } from "./dto/get-track-with-author.dto";
-import { Request } from "express";
 import { User } from "@prisma/client";
 import { TrackWithAuthorAndFeedback } from "./dto/get-track-with-autor-and-feedback";
 
@@ -16,7 +15,7 @@ export class TracksService {
   async create(
     createTrackDto: CreateTrackDto,
     file: Express.Multer.File,
-    user: User
+    user: User,
   ): Promise<TrackWithAuthor> {
     const rootDir = process.cwd();
 
@@ -71,7 +70,9 @@ export class TracksService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} track`;
+    return this.prisma.track.findUnique({
+      where: { id: id },
+    });
   }
 
   update(id: number) {
