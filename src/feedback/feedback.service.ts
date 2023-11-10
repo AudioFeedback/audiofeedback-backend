@@ -12,16 +12,12 @@ export class FeedbackService {
       data: {
         rating: createFeedbackDto.rating,
         comment: createFeedbackDto.comment,
-        timestamp: createFeedbackDto.timestamp,
         user: {
           connect: { id: Number(user.id) },
         },
         track: {
           connect: { id: Number(track.id) },
         },
-      },
-      include: {
-        user: true,
       },
     });
   }

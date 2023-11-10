@@ -11,6 +11,22 @@ import { User } from "@prisma/client";
 export class TracksService {
   constructor(private prisma: PrismaService) {}
 
+  async saveFile(file: Express.Multer.File) {
+    const rootDir = process.cwd();
+
+    const ext = path.extname(file.originalname);
+    const filetype = ext.substring(1);
+
+    const guid = uuidv4();
+    const filePath = path.join(rootDir, "audio", `${guid}${ext}`);
+
+    const writeStream = createWriteStream(filePath);
+    writeStream.write(file.buffer);
+    writeStream.end();
+
+    return { filetype, guid };
+  }
+
   async create(
     createTrackDto: CreateTrackDto,
     user: User,

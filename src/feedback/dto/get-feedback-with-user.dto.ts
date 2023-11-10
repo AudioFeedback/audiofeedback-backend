@@ -13,7 +13,7 @@ export class GetFeedbackWithUserDto {
   id: number;
   rating: boolean;
   comment: string;
-  timestamp: number;
+  timestamp: Date;
   user: GetUserDto;
 
   constructor(feedback: FeedbackWithUser) {
