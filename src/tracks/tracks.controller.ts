@@ -10,6 +10,8 @@ import {
   Header,
   Req,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from "@nestjs/common";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
@@ -21,12 +23,19 @@ import { Role, User } from "@prisma/client";
 import { Roles } from "src/auth/roles.decorator";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/roles.guard";
-import { GetTrackWithAuthorAndFeedbackDto } from "./dto/get-track-with-autor-and-feedback";
+import {
+  TrackVersionData,
+  TrackVersionsService,
+} from "./trackversions.service";
+import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
 export class TracksController {
-  constructor(private readonly tracksService: TracksService) {}
+  constructor(
+    private readonly tracksService: TracksService,
+    private readonly trackVersionsService: TrackVersionsService,
+  ) {}
 
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
@@ -52,13 +61,32 @@ export class TracksController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
+    const fileData = await this.tracksService.saveFile(file);
+
+    if (!fileData) {
+      throw new HttpException(
+        "Error in het opslaan van het bestand.",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
     const track = await this.tracksService.create(
       createTrackDto,
-      file,
       <User>req.user,
     );
 
-    return new GetTrackWithAuthorDto(track, req);
+    const trackVersionData: TrackVersionData = {
+      id: 1,
+      guid: fileData.guid,
+      filetype: fileData.filetype,
+      description: "Eerste versie van de track.",
+      versionNumber: 1,
+    };
+
+    const trackVersion =
+      await this.trackVersionsService.create(trackVersionData);
+
+    return new GetTrackWithAuthorDto(track, trackVersion, req);
   }
 
   @Get()
@@ -69,7 +97,7 @@ export class TracksController {
     const tracks = await this.tracksService.findAll(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorAndFeedbackDto(x, req);
+      return new GetTrackWithTrackVersionsDto(x, req);
     });
   }
 

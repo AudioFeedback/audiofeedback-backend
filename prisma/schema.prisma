@@ -11,36 +11,48 @@ datasource db {
 }
 
 model Track {
-  id       Int        @id @default(autoincrement())
-  title    String
-  genre    String
-  guid     String
-  filetype String
-  authorId Int
-  author   User       @relation(fields: [authorId], references: [id])
-  feedback Feedback[]
+  id            Int            @id @default(autoincrement())
+  timestamp     DateTime       @default(now())
+  title         String
+  genre         String
+  authorId      Int
+  author        User           @relation(fields: [authorId], references: [id])
+  trackVersions TrackVersion[]
+}
+
+model TrackVersion {
+  id            Int        @id @default(autoincrement())
+  timestamp     DateTime   @default(now())
+  trackId       Int
+  versionNumber Int
+  description   String
+  guid          String
+  filetype      String
+  feedback      Feedback[]
+  track         Track      @relation(fields: [trackId], references: [id])
 }
 
 model User {
   id        Int        @id @default(autoincrement())
+  timestamp DateTime   @default(now())
   username  String     @unique
   firstname String
   lastname  String
   password  String
-  roles      Role[]
+  roles     Role[]
   tracks    Track[]
   feedback  Feedback[]
 }
 
 model Feedback {
-  id        Int    @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
+  timestamp DateTime     @default(now())
   rating    Boolean
   comment   String
-  timestamp Int
   userId    Int
   trackId   Int
-  user      User   @relation(fields: [userId], references: [id])
-  track     Track  @relation(fields: [trackId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
+  track     TrackVersion @relation(fields: [trackId], references: [id])
 }
 
 enum Role {

@@ -3,7 +3,7 @@ import { Feedback } from "@prisma/client";
 export class GetFeedbackDto {
   id: number;
   rating: boolean;
-  timestamp: number;
+  timestamp: Date;
   trackId: number;
   comment: string;
 
