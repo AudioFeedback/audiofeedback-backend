@@ -1,26 +1,21 @@
-import { Injectable, Req } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { TrackWithAuthor } from "./dto/get-track-with-author.dto";
-import { Request } from "express";
 import { User } from "@prisma/client";
-import { TrackWithAuthorAndFeedback } from "./dto/get-track-with-autor-and-feedback";
 
 @Injectable()
 export class TracksService {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    createTrackDto: CreateTrackDto,
-    file: Express.Multer.File,
-    user: User
-  ): Promise<TrackWithAuthor> {
+  async saveFile(file: Express.Multer.File) {
     const rootDir = process.cwd();
 
     const ext = path.extname(file.originalname);
+    const filetype = ext.substring(1);
 
     const guid = uuidv4();
     const filePath = path.join(rootDir, "audio", `${guid}${ext}`);
@@ -29,15 +24,20 @@ export class TracksService {
     writeStream.write(file.buffer);
     writeStream.end();
 
+    return { filetype, guid };
+  }
+
+  async create(
+    createTrackDto: CreateTrackDto,
+    user: User,
+  ): Promise<TrackWithAuthor> {
     return await this.prisma.track.create({
       data: {
         title: createTrackDto.title,
-        guid: guid,
         genre: createTrackDto.genre,
         author: {
           connect: { id: Number(user.id) },
         },
-        filetype: ext.substring(1),
       },
       include: {
         author: true,
@@ -45,27 +45,13 @@ export class TracksService {
     });
   }
 
-  async findAll(user: User): Promise<TrackWithAuthorAndFeedback[]> {
+  async findAll(user: User) {
     return this.prisma.track.findMany({
       where: {
-        OR: [
-          { authorId: user.id },
-          {
-            feedback: {
-              some: {
-                userId: user.id,
-              },
-            },
-          },
-        ],
+        OR: [{ authorId: user.id }],
       },
       include: {
-        author: true,
-        feedback: {
-          where: {
-            userId: user.id,
-          },
-        },
+        trackVersions: true,
       },
     });
   }

@@ -1,10 +1,10 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, TrackVersion } from "@prisma/client";
 import { Request } from "express";
 import { GetFeedbackDto } from "src/feedback/dto/get-feedback.dto";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
-  include: { author: true, feedback: true },
+  include: { author: true, trackVersions: true },
 });
 
 export type TrackWithAuthorAndFeedback = Prisma.TrackGetPayload<
@@ -19,18 +19,15 @@ export class GetTrackWithAuthorAndFeedbackDto {
   filetype: string;
   full_url: string;
   author: GetUserDto;
+  trackVersions: TrackVersion[];
   feedback: GetFeedbackDto[];
 
   constructor(track: TrackWithAuthorAndFeedback, req: Request) {
     this.id = track.id;
     this.title = track.title;
     this.genre = track.genre;
-    this.guid = track.guid;
-    this.filetype = track.filetype;
-    this.full_url = `${req.get("Host")}/tracks/audio/${track.guid}.${
-      track.filetype
-    }`;
+    this.trackVersions = track.trackVersions;
     this.author = new GetUserDto(track.author);
-    this.feedback = track.feedback;
+    // this.feedback = track.feedback;
   }
 }
