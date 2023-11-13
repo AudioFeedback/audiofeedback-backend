@@ -10,6 +10,7 @@ $ npx prisma migrate dev --name init
 ```
 > Na een verandering in het prisma model kan het handig zijn om de database te "resetten" en deze opnieuw te seeden. Gebruik dan de volgende command:
 ```bash
+$ npx prisma db push --force-reset && npx prisma db seed
 $ npx prisma migrate reset
 ```
 

@@ -11,13 +11,17 @@ export type FeedbackWithUser = Prisma.FeedbackGetPayload<
 
 export class GetFeedbackWithUserDto {
   id: number;
+  createdAt: Date;
+  updatedAt: Date;
   rating: boolean;
   comment: string;
-  timestamp: Date;
+  timestamp: number;
   user: GetUserDto;
 
   constructor(feedback: FeedbackWithUser) {
     this.id = feedback.id;
+    this.createdAt = feedback.createdAt;
+    this.updatedAt = feedback.updatedAt;
     this.rating = feedback.rating;
     this.comment = feedback.comment;
     this.timestamp = feedback.timestamp;

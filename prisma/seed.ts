@@ -57,6 +57,7 @@ function createRandomFeedback(): FeedbackData {
   return {
     rating: fakerNL.datatype.boolean(),
     comment: fakerNL.lorem.lines({min: 1, max: 1}),
+    timestamp: fakerNL.number.float({min: 0.1, precision: 0.01 }),
   }
 }
 
@@ -127,6 +128,7 @@ interface TrackData {
 interface FeedbackData {
   rating: boolean;
   comment: string;
+  timestamp: number;
 }
 
 // Zie folder discord, importeer deze in de folder /audio

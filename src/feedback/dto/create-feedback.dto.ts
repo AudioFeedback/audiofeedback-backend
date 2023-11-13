@@ -7,4 +7,6 @@ export class CreateFeedbackDto {
   comment: string;
   @IsNotEmpty()
   trackId: number;
+  @IsNotEmpty()
+  timestamp: number;
 }

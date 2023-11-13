@@ -3,7 +3,8 @@ import { Request } from "express";
 
 export class GetTrackVersionDto {
   id: number;
-  timestamp: Date;
+  createdAt: Date;
+  updatedAt: Date;
   trackId: number;
   versionNumber: number;
   description: string;
@@ -13,7 +14,8 @@ export class GetTrackVersionDto {
 
   constructor(trackVersion: TrackVersion, req: Request) {
     this.id = trackVersion.id;
-    this.timestamp = trackVersion.timestamp;
+    this.createdAt = trackVersion.createdAt;
+    this.updatedAt = trackVersion.updatedAt;
     this.versionNumber = trackVersion.versionNumber;
     this.description = trackVersion.description;
     this.guid = trackVersion.guid;

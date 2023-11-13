@@ -17,7 +17,9 @@ export type TrackVersionDeep = Prisma.TrackVersionGetPayload<
 
 export class GetTrackVersionDeepDto {
   id: number;
-  timestamp: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  timestamp: number;
   trackId: number;
   versionNumber: number;
   description: string;
@@ -28,7 +30,8 @@ export class GetTrackVersionDeepDto {
 
   constructor(trackVersion: TrackVersionDeep, req: Request) {
     this.id = trackVersion.id;
-    this.timestamp = trackVersion.timestamp;
+    this.createdAt = trackVersion.createdAt;
+    this.updatedAt = trackVersion.updatedAt;
     this.versionNumber = trackVersion.versionNumber;
     this.description = trackVersion.description;
     this.guid = trackVersion.guid;
