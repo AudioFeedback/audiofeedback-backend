@@ -1,5 +1,4 @@
 import { Prisma, Role } from "@prisma/client";
-import { Request } from "express";
 import { GetFeedbackDto } from "src/feedback/dto/get-feedback.dto";
 import { GetTrackDto } from "src/tracks/dto/get-track.dto";
 
@@ -17,7 +16,7 @@ export class GetUserWithTrackDto {
   tracks?: GetTrackDto[];
   feedback?: GetFeedbackDto[];
 
-  constructor(user: UserWithTrack, req: Request) {
+  constructor(user: UserWithTrack) {
     this.id = user.id;
     this.firstname = user.firstname;
     this.roles = user.roles;

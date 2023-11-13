@@ -13,7 +13,7 @@ datasource db {
 model Track {
   id            Int            @id @default(autoincrement())
   createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   title         String
   genre         String
   authorId      Int
@@ -24,7 +24,7 @@ model Track {
 model TrackVersion {
   id            Int        @id @default(autoincrement())
   createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   trackId       Int
   versionNumber Int
   description   String
@@ -37,7 +37,7 @@ model TrackVersion {
 model User {
   id        Int        @id @default(autoincrement())
   createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   username  String     @unique
   firstname String
   lastname  String
@@ -50,8 +50,8 @@ model User {
 model Feedback {
   id        Int          @id @default(autoincrement())
   createdAt DateTime     @default(now())
-  updatedAt DateTime     @default(now())
-  timestamp Int
+  updatedAt DateTime     @updatedAt
+  timestamp Float
   rating    Boolean
   comment   String
   userId    Int
