@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
   UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
@@ -16,7 +15,6 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Role, User } from "@prisma/client";
 import { GetUserWithTrackDto } from "./dto/get-user-with-track.dto";
 import { GetTrackDto } from "src/tracks/dto/get-track.dto";
-import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
@@ -36,7 +34,7 @@ export class UsersController {
 
   @Get()
   @Roles(Role.ADMIN)
-  async findAll(@Req() req: Request): Promise<GetUserWithTrackDto[]> {
+  async findAll(): Promise<GetUserWithTrackDto[]> {
     const users = await this.usersService.findAll();
     return users.map((x) => {
       return {

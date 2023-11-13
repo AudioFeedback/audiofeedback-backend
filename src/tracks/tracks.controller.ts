@@ -117,13 +117,9 @@ export class TracksController {
     @Req() req: Request,
     @Param("trackId") trackId: number,
   ) {
-
-    const track = await this.tracksService.findAllVersions(Number(trackId))
+    const track = await this.tracksService.findAllVersions(Number(trackId));
     if (!track) {
-      throw new HttpException(
-        "Track niet gevonden.",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException("Track niet gevonden.", HttpStatus.NOT_FOUND);
     }
 
     const fileData = await this.tracksService.saveFile(file);
@@ -140,10 +136,12 @@ export class TracksController {
       guid: fileData.guid,
       filetype: fileData.filetype,
       description: createTrackDto.description,
-      versionNumber: Math.max(...track.trackVersions.map(x => x.versionNumber)) + 1,
+      versionNumber:
+        Math.max(...track.trackVersions.map((x) => x.versionNumber)) + 1,
     };
 
-    const trackVersion = await this.trackVersionsService.create(trackVersionData);
+    const trackVersion =
+      await this.trackVersionsService.create(trackVersionData);
 
     return new GetTrackVersionDto(trackVersion, req);
   }
