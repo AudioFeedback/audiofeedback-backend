@@ -51,7 +51,7 @@ model Feedback {
   id        Int          @id @default(autoincrement())
   createdAt DateTime     @default(now())
   updatedAt DateTime     @default(now())
-  timestamp Int
+  timestamp Float
   rating    Boolean
   comment   String
   userId    Int
