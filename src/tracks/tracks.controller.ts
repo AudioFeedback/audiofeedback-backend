@@ -29,6 +29,8 @@ import {
 } from "./trackversions.service";
 import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
 import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
+import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
+import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -50,6 +52,7 @@ export class TracksController {
       properties: {
         title: { type: "string" },
         genre: { type: "string" },
+        description: { type: "string" },
         file: {
           type: "string",
           format: "binary",
@@ -77,7 +80,7 @@ export class TracksController {
     );
 
     const trackVersionData: TrackVersionData = {
-      id: 1,
+      id: track.id,
       guid: fileData.guid,
       filetype: fileData.filetype,
       description: "Eerste versie van de track.",
@@ -88,6 +91,61 @@ export class TracksController {
       await this.trackVersionsService.create(trackVersionData);
 
     return new GetTrackWithAuthorDto(track, trackVersion, req);
+  }
+
+  @Post("/:trackId")
+  @Roles(Role.MUZIEKPRODUCER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        description: { type: "string" },
+        file: {
+          type: "string",
+          format: "binary",
+        },
+      },
+    },
+  })
+  async createNewVersion(
+    @Body() createTrackDto: CreateTrackVersionDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
+    @Param("trackId") trackId: number,
+  ) {
+
+    const track = await this.tracksService.findAllVersions(Number(trackId))
+    if (!track) {
+      throw new HttpException(
+        "Track niet gevonden.",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const fileData = await this.tracksService.saveFile(file);
+
+    if (!fileData) {
+      throw new HttpException(
+        "Error in het opslaan van het bestand.",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const trackVersionData: TrackVersionData = {
+      id: trackId,
+      guid: fileData.guid,
+      filetype: fileData.filetype,
+      description: createTrackDto.description,
+      versionNumber: Math.max(...track.trackVersions.map(x => x.versionNumber)) + 1,
+    };
+
+    const trackVersion = await this.trackVersionsService.create(trackVersionData);
+
+    return new GetTrackVersionDto(trackVersion, req);
   }
 
   @Get()
