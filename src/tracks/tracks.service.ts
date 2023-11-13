@@ -79,6 +79,15 @@ export class TracksService {
     });
   }
 
+  findAllVersions(id: number) {
+    return this.prisma.track.findUnique({
+      where: { id: id },
+      include: {
+        trackVersions: true,
+      },
+    });
+  }
+
   update(id: number) {
     return `This action updates a #${id} track`;
   }
