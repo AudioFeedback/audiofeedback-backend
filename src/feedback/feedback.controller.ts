@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  // Patch,
+  Patch,
   Req,
   Param,
   Delete,
@@ -19,6 +19,7 @@ import { RolesGuard } from "src/auth/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { TracksService } from "src/tracks/tracks.service";
 import { GetFeedbackDto } from "./dto/get-feedback.dto";
+import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
 
 @ApiTags("feedback")
 @Controller("feedback")
@@ -55,15 +56,17 @@ export class FeedbackController {
     return this.feedbackService.findOne(+id);
   }
 
-  // @Patch(":id")
-  // update(
-  //   @Param("id") id: string,
-  //   @Body() updateFeedbackDto: UpdateFeedbackDto,
-  // ) {
-  //   return this.feedbackService.update(+id, updateFeedbackDto);
-  // }
+  @Patch(":id")
+  @Roles(Role.FEEDBACKGEVER)
+  update(
+    @Param("id") id: string,
+    @Body() updateFeedbackDto: UpdateFeedbackDto,
+  ) {
+    return this.feedbackService.update(+id, updateFeedbackDto);
+  }
 
   @Delete(":id")
+  @Roles(Role.ADMIN)
   remove(@Param("id") id: string) {
     return this.feedbackService.remove(+id);
   }

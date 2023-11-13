@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { FeedbackWithUser } from "./dto/get-feedback-with-user.dto";
 import { CreateFeedbackDto } from "./dto/create-feedback.dto";
 import { Track, User } from "@prisma/client";
-// import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
+import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
 
 @Injectable()
 export class FeedbackService {
@@ -41,11 +41,31 @@ export class FeedbackService {
     return `This action returns a #${id} feedback`;
   }
 
-  // update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
-  //   return `This action updates a #${id} feedback`;
-  // }
+  async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
+    const existingFeedback = await this.prisma.feedback.findUnique({
+      where: { id },
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} feedback`;
+    if (!existingFeedback) {
+      throw new NotFoundException("Feedback with ID ${id} not found");
+    }
+
+    const updatedFeedback = await this.prisma.feedback.update({
+      where: { id },
+      data: updateFeedbackDto,
+    });
+    return updatedFeedback;
+  }
+
+  async remove(id: number) {
+    const existingFeedback = await this.prisma.feedback.findUnique({
+      where: { id },
+    });
+
+    if (!existingFeedback) {
+      throw new NotFoundException("Feedback with ID ${id} not found");
+    }
+
+    return this.prisma.feedback.delete({ where: { id } });
   }
 }
