@@ -36,7 +36,7 @@ export class UsersController {
 
   @Get()
   @Roles(Role.ADMIN)
-  async findAll(@Req() req: Request): Promise<GetUserWithTrackDto[]> {
+  async findAll(@Req() req: Request) {
     const users = await this.usersService.findAll();
     return users.map((x) => {
       return {
