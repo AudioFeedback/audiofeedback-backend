@@ -1,5 +1,6 @@
-import { Feedback, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { Request } from "express";
+import { GetFeedbackWithUserDto } from "src/feedback/dto/get-feedback-with-user.dto";
 
 const trackVersionDeep = Prisma.validator<Prisma.TrackVersionDefaultArgs>()({
   include: {
@@ -26,7 +27,7 @@ export class GetTrackVersionDeepDto {
   guid: string;
   filetype: string;
   fullUrl: string;
-  feedback: Feedback[];
+  feedback: GetFeedbackWithUserDto[];
 
   constructor(trackVersion: TrackVersionDeep, req: Request) {
     this.id = trackVersion.id;
@@ -39,6 +40,8 @@ export class GetTrackVersionDeepDto {
     this.fullUrl = `${req.get("Host")}/tracks/audio/${trackVersion.guid}.${
       trackVersion.filetype
     }`;
-    this.feedback = trackVersion.feedback;
+    this.feedback = trackVersion.feedback.map(
+      (x) => new GetFeedbackWithUserDto(x),
+    );
   }
 }

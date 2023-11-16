@@ -5,6 +5,7 @@ import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { UsersService } from "./users/users.service";
 import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
+import { GetUserDto } from "./users/dto/get-user.dto";
 
 @Controller()
 export class AppController {
@@ -37,7 +38,10 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get("profile")
-  getProfile(@Request() req) {
-    return this.userService.findOne({ username: req.user.username });
+  async getProfile(@Request() req) {
+    const user = await this.userService.findOne({
+      username: req.user.username,
+    });
+    return new GetUserDto(user);
   }
 }

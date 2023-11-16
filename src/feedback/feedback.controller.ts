@@ -47,7 +47,8 @@ export class FeedbackController {
 
   @Get()
   async findAll() {
-    return await this.feedbackService.findAll();
+    const feedback = await this.feedbackService.findAll();
+    return feedback.map((x) => new GetFeedbackDto(x));
   }
 
   @Get(":id")
