@@ -32,7 +32,7 @@ import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 // import { GetUserDto } from "src/users/dto/get-user.dto";
-// import { GetTrackDto } from "./dto/get-track.dto";
+import { GetTrackDto } from "./dto/get-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -41,7 +41,6 @@ export class TracksController {
     private readonly tracksService: TracksService,
     private readonly trackVersionsService: TrackVersionsService,
   ) {}
-
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -55,6 +54,7 @@ export class TracksController {
         title: { type: "string" },
         genre: { type: "string" },
         description: { type: "string" },
+        reviewerIds: { type: "array", items: { type: "number" } },
         file: {
           type: "string",
           format: "binary",
@@ -62,36 +62,40 @@ export class TracksController {
       },
     },
   })
+  
+  
   async create(
     @Body() createTrackDto: CreateTrackDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
-  ) {
-    const fileData = await this.tracksService.saveFile(file);
+    ) {
+      console.log(createTrackDto);
 
-    if (!fileData) {
-      throw new HttpException(
-        "Error in het opslaan van het bestand.",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-    const track = await this.tracksService.create(
-      createTrackDto,
-      <User>req.user,
-    );
+    //   const fileData = await this.tracksService.saveFile(file);
 
-    const trackVersionData: TrackVersionData = {
-      id: track.id,
-      guid: fileData.guid,
-      filetype: fileData.filetype,
-      description: "Eerste versie van de track.",
-      versionNumber: 1,
-    };
+    //   if (!fileData) {
+    //     throw new HttpException(
+    //       "Error in het opslaan van het bestand.",
+    //     HttpStatus.INTERNAL_SERVER_ERROR,
+    //   );
+    // }
+    // const track = await this.tracksService.create(
+    //   createTrackDto,
+    //   <User>req.user,
+    // );
 
-    const trackVersion =
-      await this.trackVersionsService.create(trackVersionData);
+    // const trackVersionData: TrackVersionData = {
+    //   id: track.id,
+    //   guid: fileData.guid,
+    //   filetype: fileData.filetype,
+    //   description: "Eerste versie van de track.",
+    //   versionNumber: 1,
+    // };
 
-    return new GetTrackWithAuthorDto(track, trackVersion, req);
+    // const trackVersion =
+    //   await this.trackVersionsService.create(trackVersionData);
+
+    // return new GetTrackWithAuthorDto(track, trackVersion, req);
   }
 
   @Post("/:trackId")
@@ -163,6 +167,19 @@ export class TracksController {
   async getReviewers() {
     return await this.tracksService.getReviewers();
   }
+
+  // @Post('reviewers')
+  // async createTrack(
+  // @Req() req: Request,
+  // @Body() 
+  // createTrackDto: CreateTrackDto
+  // ) {
+  //   const trackWithReviewer = await this.tracksService.create(
+  //     createTrackDto,
+  //     <User>req.user,
+  //   );
+  //   return new GetTrackDto(trackWithReviewer);
+  // }
 
   @Get("audio/:filename")
   @Header("Accept-Ranges", "bytes")
