@@ -34,6 +34,6 @@ export class GetTrackDeepDto {
     this.trackversions = track.trackVersions.map(
       (x) => new GetTrackVersionDeepDto(x, req),
     );
-    this.reviewers = track.reviewers.map(x => new GetUserDto(x))
+    this.reviewers = track.reviewers.map((x) => new GetUserDto(x));
   }
 }

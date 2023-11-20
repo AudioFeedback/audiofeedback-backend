@@ -31,6 +31,7 @@ import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions
 import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
+import { GetTrackWithAuthorAndReviewersDto } from "./dto/get-track-with-author-and-reviewers.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -96,7 +97,7 @@ export class TracksController {
     const trackVersion =
       await this.trackVersionsService.create(trackVersionData);
 
-    return new GetTrackWithAuthorDto(track, trackVersion, req);
+    return new GetTrackWithAuthorAndReviewersDto(track, trackVersion, req);
   }
 
   @Post("/:trackId")
@@ -165,7 +166,7 @@ export class TracksController {
     });
   }
 
-  @Get("reviewers")
+  @Get("reviewer/reviewers")
   async getReviewers() {
     return await this.tracksService.getReviewers();
   }
@@ -198,6 +199,16 @@ export class TracksController {
   async findOne(@Param("id") id: string, @Req() req: Request) {
     const track = await this.tracksService.findOneDeep(+id);
     return new GetTrackDeepDto(track, req);
+  }
+
+  @Get("reviewer/reviewable")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.FEEDBACKGEVER)
+  async getReviewable(@Req() req: Request) {
+    const tracks = await this.tracksService.getReviewable(<User>req.user);
+    console.log(tracks);
+    return tracks.map((x) => new GetTrackWithAuthorDto(x));
   }
 
   // @Patch(':id')

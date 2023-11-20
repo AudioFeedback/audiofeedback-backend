@@ -4,7 +4,6 @@ import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
-import { TrackWithAuthor } from "./dto/get-track-with-author.dto";
 import { User } from "@prisma/client";
 import * as mm from "music-metadata";
 
@@ -44,10 +43,7 @@ export class TracksService {
     }
   }
 
-  async create(
-    createTrackDto: CreateTrackDto,
-    user: User,
-  ): Promise<TrackWithAuthor> {
+  async create(createTrackDto: CreateTrackDto, user: User) {
     const reviewers = await this.prisma.user.findMany({
       where: {
         roles: {
@@ -160,5 +156,20 @@ export class TracksService {
     const rootDir = process.cwd();
     const mp3FilePath = path.join(rootDir, "audio", filename);
     return readFileSync(mp3FilePath, null);
+  }
+
+  async getReviewable(user: User) {
+    return this.prisma.track.findMany({
+      include: {
+        author: true,
+      },
+      where: {
+        reviewers: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+    });
   }
 }

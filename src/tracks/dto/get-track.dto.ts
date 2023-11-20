@@ -4,9 +4,6 @@ export class GetTrackDto {
   id: number;
   title: string;
   genre: string;
-  guid: string;
-  filetype: string;
-  full_url: string;
 
   constructor(track: Track) {
     this.id = track.id;
