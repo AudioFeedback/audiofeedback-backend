@@ -7,6 +7,7 @@ export interface TrackVersionData {
   filetype: string;
   description: string;
   versionNumber: number;
+  duration: number;
 }
 
 @Injectable()
@@ -20,6 +21,7 @@ export class TrackVersionsService {
         filetype: track.filetype,
         description: track.description,
         versionNumber: track.versionNumber,
+        duration: track.duration,
         track: {
           connect: { id: Number(track.id) },
         },

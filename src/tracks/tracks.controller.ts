@@ -28,7 +28,7 @@ import {
   TrackVersionsService,
 } from "./trackversions.service";
 import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
-import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
+import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 // import { GetUserDto } from "src/users/dto/get-user.dto";
@@ -68,34 +68,33 @@ export class TracksController {
     @Body() createTrackDto: CreateTrackDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
-    ) {
-      console.log(createTrackDto);
+  ) {
+    const fileData = await this.tracksService.saveFile(file);
 
-    //   const fileData = await this.tracksService.saveFile(file);
+    if (!fileData) {
+      throw new HttpException(
+        "Error in het opslaan van het bestand.",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    const track = await this.tracksService.create(
+      createTrackDto,
+      <User>req.user,
+    );
 
-    //   if (!fileData) {
-    //     throw new HttpException(
-    //       "Error in het opslaan van het bestand.",
-    //     HttpStatus.INTERNAL_SERVER_ERROR,
-    //   );
-    // }
-    // const track = await this.tracksService.create(
-    //   createTrackDto,
-    //   <User>req.user,
-    // );
+    const trackVersionData: TrackVersionData = {
+      id: track.id,
+      guid: fileData.guid,
+      filetype: fileData.filetype,
+      description: "Eerste versie van de track.",
+      versionNumber: 1,
+      duration: fileData.duration,
+    };
 
-    // const trackVersionData: TrackVersionData = {
-    //   id: track.id,
-    //   guid: fileData.guid,
-    //   filetype: fileData.filetype,
-    //   description: "Eerste versie van de track.",
-    //   versionNumber: 1,
-    // };
+    const trackVersion =
+      await this.trackVersionsService.create(trackVersionData);
 
-    // const trackVersion =
-    //   await this.trackVersionsService.create(trackVersionData);
-
-    // return new GetTrackWithAuthorDto(track, trackVersion, req);
+    return new GetTrackWithAuthorDto(track, trackVersion, req);
   }
 
   @Post("/:trackId")
@@ -143,6 +142,7 @@ export class TracksController {
       description: createTrackDto.description,
       versionNumber:
         Math.max(...track.trackVersions.map((x) => x.versionNumber)) + 1,
+      duration: fileData.duration,
     };
 
     const trackVersion =

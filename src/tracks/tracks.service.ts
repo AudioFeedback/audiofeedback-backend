@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { TrackWithAuthor } from "./dto/get-track-with-author.dto";
 import { User } from "@prisma/client";
+import * as mm from "music-metadata";
 
 @Injectable()
 export class TracksService {
@@ -24,7 +25,23 @@ export class TracksService {
     writeStream.write(file.buffer);
     writeStream.end();
 
-    return { filetype, guid };
+    const duration = await this.getAudioDuration(file);
+
+    return { filetype, guid, duration };
+  }
+
+  private async getAudioDuration(
+    file: Express.Multer.File,
+  ): Promise<number | undefined> {
+    try {
+      const metadata = await mm.parseBuffer(file.buffer, file.mimetype, {
+        duration: true,
+      });
+      return metadata.format?.duration;
+    } catch (error) {
+      console.error("Error reading audio file metadata:", error.message);
+      return undefined;
+    }
   }
 
   async create(

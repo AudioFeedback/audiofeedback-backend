@@ -15,6 +15,8 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors();
+
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
@@ -24,9 +26,12 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  SwaggerModule.setup("api", app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
-  app.enableCors();
   await app.listen(3000);
 
   // Dit stukje code zorgt ervoor dat "hot reloading" werkt in development
