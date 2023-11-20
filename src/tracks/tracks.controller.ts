@@ -28,7 +28,7 @@ import {
   TrackVersionsService,
 } from "./trackversions.service";
 import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
-import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
+import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 // import { GetUserDto } from "src/users/dto/get-user.dto";
@@ -86,6 +86,7 @@ export class TracksController {
       filetype: fileData.filetype,
       description: "Eerste versie van de track.",
       versionNumber: 1,
+      duration: fileData.duration,
     };
 
     const trackVersion =
@@ -139,6 +140,7 @@ export class TracksController {
       description: createTrackDto.description,
       versionNumber:
         Math.max(...track.trackVersions.map((x) => x.versionNumber)) + 1,
+      duration: fileData.duration,
     };
 
     const trackVersion =

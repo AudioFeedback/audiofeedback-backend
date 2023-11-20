@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { Request } from "express";
-import { GetTrackVersionDto } from "./get-trackversion.dto";
-import { GetTrackVersionDeepDto } from "./get-trackversion-deep.dto";
+import { GetTrackVersionDeepDto } from "./get-trackversion.deep.dto";
 
 const trackDeep = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: {
@@ -23,7 +22,7 @@ export class GetTrackDeepDto {
   id: number;
   title: string;
   genre: string;
-  trackversions: GetTrackVersionDto[];
+  trackversions: GetTrackVersionDeepDto[];
 
   constructor(track: TrackDeep, req: Request) {
     this.id = track.id;

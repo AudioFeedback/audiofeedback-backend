@@ -11,6 +11,7 @@ export class GetTrackVersionDto {
   guid: string;
   filetype: string;
   fullUrl: string;
+  duration: number;
 
   constructor(trackVersion: TrackVersion, req: Request) {
     this.id = trackVersion.id;
@@ -23,5 +24,6 @@ export class GetTrackVersionDto {
     this.fullUrl = `${req.get("Host")}/tracks/audio/${trackVersion.guid}.${
       trackVersion.filetype
     }`;
+    this.duration = trackVersion.duration;
   }
 }
