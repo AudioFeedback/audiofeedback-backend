@@ -52,20 +52,20 @@ export class TracksService {
       },
     });
 
-    if (
-      !createTrackDto.reviewerIds
-        .split(",")
-        .map((x) => Number(x))
-        .every((x) => reviewers.map((x) => x.id).includes(x))
-    ) {
-      throw new NotFoundException(
-        "Invalid user(s) or role specified for reviewers.",
-      );
-    }
+    const reviewerIds = createTrackDto.reviewerIds.split(",");
 
-    const reviewerIds = createTrackDto.reviewerIds.split(",")
+    if (reviewerIds.length > 0) {
+      if (
+        !createTrackDto.reviewerIds
+          .split(",")
+          .map((x) => Number(x))
+          .every((x) => reviewers.map((x) => x.id).includes(x))
+      ) {
+        throw new NotFoundException(
+          "Invalid user(s) or role specified for reviewers.",
+        );
+      }
 
-    if(reviewerIds.length > 0) {
       return await this.prisma.track.create({
         data: {
           title: createTrackDto.title,
