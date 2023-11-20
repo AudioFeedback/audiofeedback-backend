@@ -166,11 +166,6 @@ export class TracksController {
     });
   }
 
-  @Get("reviewer/reviewers")
-  async getReviewers() {
-    return await this.tracksService.getReviewers();
-  }
-
   // @Post('reviewers')
   // async createTrack(
   // @Req() req: Request,
@@ -207,7 +202,6 @@ export class TracksController {
   @Roles(Role.FEEDBACKGEVER)
   async getReviewable(@Req() req: Request) {
     const tracks = await this.tracksService.getReviewable(<User>req.user);
-    console.log(tracks);
     return tracks.map((x) => new GetTrackWithAuthorDto(x));
   }
 

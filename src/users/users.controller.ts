@@ -18,6 +18,7 @@ import { GetTrackDto } from "src/tracks/dto/get-track.dto";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/roles.guard";
 import { Roles } from "src/auth/roles.decorator";
+import { GetUserDto } from "./dto/get-user.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -62,5 +63,11 @@ export class UsersController {
   @Roles(Role.ADMIN)
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Get("reviewers")
+  async getReviewers() {
+    const reviewers = await this.usersService.getReviewers();
+    return reviewers.map((x) => new GetUserDto(x));
   }
 }

@@ -86,20 +86,6 @@ export class TracksService {
     });
   }
 
-  async getReviewers() {
-    return this.prisma.user.findMany({
-      where: {
-        roles: {
-          has: "FEEDBACKGEVER",
-        },
-      },
-    });
-
-    // const reviewerIds = reviewers.map((reviewer: User) => reviewer.id);
-
-    // return reviewerIds;
-  }
-
   async findAll(user: User) {
     return this.prisma.track.findMany({
       where: {
