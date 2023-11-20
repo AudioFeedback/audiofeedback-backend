@@ -191,7 +191,7 @@ export class TracksController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.MUZIEKPRODUCER)
-  async findOne(@Param("id") id: string, @Req() req: Request) {
+  async findOne(@Param("id") id: number, @Req() req: Request) {
     const track = await this.tracksService.findOneDeep(+id);
     return new GetTrackDeepDto(track, req);
   }

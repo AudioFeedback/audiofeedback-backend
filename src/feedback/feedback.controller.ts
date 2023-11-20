@@ -53,14 +53,14 @@ export class FeedbackController {
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  findOne(@Param("id") id: number) {
     return this.feedbackService.findOne(+id);
   }
 
   @Patch(":id")
   @Roles(Role.FEEDBACKGEVER)
   update(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
   ) {
     return this.feedbackService.update(+id, updateFeedbackDto);
@@ -68,7 +68,7 @@ export class FeedbackController {
 
   @Delete(":id")
   @Roles(Role.ADMIN)
-  remove(@Param("id") id: string) {
+  remove(@Param("id") id: number) {
     return this.feedbackService.remove(+id);
   }
 }
