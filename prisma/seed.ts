@@ -7,32 +7,33 @@ async function main() {
   const superUser = await createRandomUser([Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN], "superuser");
 
   const admin = await createRandomUser([Role.ADMIN], "admin");
+  const feedbackgever1 = await createRandomUser([Role.FEEDBACKGEVER], "feedbackgever");
+  const feedbackgever2= await createRandomUser([Role.FEEDBACKGEVER]);
+  const feedbackgever3 = await createRandomUser([Role.FEEDBACKGEVER]);
+
 
   const musicProducer1 = await createRandomUser([Role.MUZIEKPRODUCER], "muziekproducer");
 
-  const PhonHouseBeatTrack = await addTrackToMusicProducer(musicProducer1, PhonHouseBeat);
-  const WatrByYourSideTrack = await addTrackToMusicProducer(musicProducer1, WatrByYourSide);
-  const FuturisticBeatTrack = await addTrackToMusicProducer(musicProducer1, FuturisticBeat);
+  const PhonHouseBeatTrack = await addTrackToMusicProducer(musicProducer1, PhonHouseBeat, [feedbackgever1, feedbackgever3]);
+  const WatrByYourSideTrack = await addTrackToMusicProducer(musicProducer1, WatrByYourSide, [feedbackgever1, feedbackgever2, feedbackgever3]);
+  const FuturisticBeatTrack = await addTrackToMusicProducer(musicProducer1, FuturisticBeat, [feedbackgever1, feedbackgever2, feedbackgever3]);
 
   const musicroducer2 = await createRandomUser([Role.MUZIEKPRODUCER]);
 
-  const EmbraceTrack = await addTrackToMusicProducer(musicroducer2, Embrace);
-  const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog);
+  const EmbraceTrack = await addTrackToMusicProducer(musicroducer2, Embrace, [feedbackgever1, feedbackgever2, feedbackgever3]);
+  const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog, [feedbackgever3]);
 
 
-  const feedbackgever1 = await createRandomUser([Role.FEEDBACKGEVER], "feedbackgever");
   await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever1)
 
-  const feedbackgever2= await createRandomUser([Role.FEEDBACKGEVER]);
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever2)
   await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever2)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever2)
 
 
-  const feedbackgever3 = await createRandomUser([Role.FEEDBACKGEVER]);
   await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever3)
@@ -61,7 +62,7 @@ function createRandomFeedback(): FeedbackData {
   }
 }
 
-async function addTrackToMusicProducer(user: User, trackData: TrackData) {
+async function addTrackToMusicProducer(user: User, trackData: TrackData, reviewers: User[]) {
 
   const {title, genre, versionNumber, description, guid, filetype, duration} = trackData;
 
@@ -69,6 +70,9 @@ async function addTrackToMusicProducer(user: User, trackData: TrackData) {
     data: {
       title: title,
       genre: genre,
+      reviewers: {
+        connect: reviewers.map(x => { return {username: x.username}}),
+      },
       author: {
         connect: {username: user.username}
       }
