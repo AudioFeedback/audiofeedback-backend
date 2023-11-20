@@ -31,6 +31,8 @@ import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions
 import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
+// import { GetUserDto } from "src/users/dto/get-user.dto";
+// import { GetTrackDto } from "./dto/get-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -73,7 +75,6 @@ export class TracksController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
     const track = await this.tracksService.create(
       createTrackDto,
       <User>req.user,
@@ -156,6 +157,11 @@ export class TracksController {
     return tracks.map((x) => {
       return new GetTrackWithTrackVersionsDto(x, req);
     });
+  }
+
+  @Get("reviewers")
+  async getReviewers() {
+    return await this.tracksService.getReviewers();
   }
 
   @Get("audio/:filename")

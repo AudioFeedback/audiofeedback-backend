@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsArray, IsInt, IsNotEmpty, IsOptional } from "class-validator";
 
 export class CreateTrackDto {
   @IsNotEmpty()
@@ -7,4 +7,8 @@ export class CreateTrackDto {
   genre: string;
   @IsNotEmpty()
   description: string;
+  @IsArray()
+  @IsInt({ each: true })
+  @IsOptional()
+  reviewerIds: number[];
 }

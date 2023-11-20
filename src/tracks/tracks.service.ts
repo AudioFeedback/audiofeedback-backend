@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { createWriteStream, readFileSync } from "fs";
 import * as path from "path";
@@ -27,20 +27,83 @@ export class TracksService {
     return { filetype, guid };
   }
 
+  // scuffed old code perchance
+
+  // async getReviewers() {
+  //   return this.prisma.user.findMany({
+  //     where: {
+  //       roles: { has: 'FEEDBACKGEVER' },
+  //     },
+  //   });
+  // }
+
+  // async assignReviewer(trackId: number, reviewerId: number) {
+  //   const track = await this.prisma.track.findUnique({
+  //     where: { id: trackId },
+  //     include: { author: true, reviewers: true},
+  //   });
+
+  //   if (track.author.id === reviewerId) {
+  //     throw new NotFoundException('Author cannot be a reviewer for their own track.');
+  //   }
+
+  //   const isReviewer = track.reviewers.some((reviewer) => reviewer.id === reviewerId);
+  //   if (isReviewer) {
+  //     throw new NotFoundException('User is already a reviewer for this track');
+  //   }
+
+  //   return this.prisma.track.update({
+  //     where: { id: trackId },
+  //     data: {
+  //       reviewers: {
+  //         connect: { id: reviewerId },
+  //       },
+  //     },
+  //   });
+  // }
+
   async create(
     createTrackDto: CreateTrackDto,
     user: User,
   ): Promise<TrackWithAuthor> {
+    const { reviewerIds, ...trackData } = createTrackDto;
+
+    const reviewers = await this.prisma.user.findMany({
+      where: {
+        roles: {
+          has: "FEEDBACKGEVER",
+        },
+      },
+    });
+
+    if (reviewers.length !== reviewerIds.length) {
+      throw new NotFoundException(
+        "Invalid user(s) or role specified for reviewers.",
+      );
+    }
+
     return await this.prisma.track.create({
       data: {
-        title: createTrackDto.title,
-        genre: createTrackDto.genre,
+        ...trackData,
         author: {
           connect: { id: Number(user.id) },
+        },
+        reviewers: {
+          connect: reviewerIds.map((id) => ({ id })),
         },
       },
       include: {
         author: true,
+      },
+    });
+  }
+
+  async getReviewers() {
+    return this.prisma.user.findMany({
+      where: {
+        roles: {
+          has: "FEEDBACKGEVER",
+        },
       },
     });
   }
