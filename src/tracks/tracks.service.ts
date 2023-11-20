@@ -44,41 +44,6 @@ export class TracksService {
     }
   }
 
-  // scuffed old code perchance
-
-  // async getReviewers() {
-  //   return this.prisma.user.findMany({
-  //     where: {
-  //       roles: { has: 'FEEDBACKGEVER' },
-  //     },
-  //   });
-  // }
-
-  // async assignReviewer(trackId: number, reviewerId: number) {
-  //   const track = await this.prisma.track.findUnique({
-  //     where: { id: trackId },
-  //     include: { author: true, reviewers: true},
-  //   });
-
-  //   if (track.author.id === reviewerId) {
-  //     throw new NotFoundException('Author cannot be a reviewer for their own track.');
-  //   }
-
-  //   const isReviewer = track.reviewers.some((reviewer) => reviewer.id === reviewerId);
-  //   if (isReviewer) {
-  //     throw new NotFoundException('User is already a reviewer for this track');
-  //   }
-
-  //   return this.prisma.track.update({
-  //     where: { id: trackId },
-  //     data: {
-  //       reviewers: {
-  //         connect: { id: reviewerId },
-  //       },
-  //     },
-  //   });
-  // }
-
   async create(
     createTrackDto: CreateTrackDto,
     user: User,
@@ -106,7 +71,7 @@ export class TracksService {
           connect: { id: Number(user.id) },
         },
         reviewers: {
-          connect: reviewerIds.map((id) => ({ id })),
+          connect: reviewerIds.map((id) => Number(id)),
         },
       },
       include: {
@@ -123,6 +88,10 @@ export class TracksService {
         },
       },
     });
+
+    // const reviewerIds = reviewers.map((reviewer: User) => reviewer.id);
+
+    // return reviewerIds;
   }
 
   async findAll(user: User) {

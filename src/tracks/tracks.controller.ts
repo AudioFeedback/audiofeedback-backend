@@ -32,7 +32,7 @@ import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 // import { GetUserDto } from "src/users/dto/get-user.dto";
-// import { GetTrackDto } from "./dto/get-track.dto";
+import { GetTrackDto } from "./dto/get-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -41,7 +41,6 @@ export class TracksController {
     private readonly tracksService: TracksService,
     private readonly trackVersionsService: TrackVersionsService,
   ) {}
-
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -55,6 +54,7 @@ export class TracksController {
         title: { type: "string" },
         genre: { type: "string" },
         description: { type: "string" },
+        reviewerIds: { type: "array", items: { type: "number" } },
         file: {
           type: "string",
           format: "binary",
@@ -62,6 +62,8 @@ export class TracksController {
       },
     },
   })
+  
+  
   async create(
     @Body() createTrackDto: CreateTrackDto,
     @UploadedFile() file: Express.Multer.File,
@@ -165,6 +167,19 @@ export class TracksController {
   async getReviewers() {
     return await this.tracksService.getReviewers();
   }
+
+  // @Post('reviewers')
+  // async createTrack(
+  // @Req() req: Request,
+  // @Body() 
+  // createTrackDto: CreateTrackDto
+  // ) {
+  //   const trackWithReviewer = await this.tracksService.create(
+  //     createTrackDto,
+  //     <User>req.user,
+  //   );
+  //   return new GetTrackDto(trackWithReviewer);
+  // }
 
   @Get("audio/:filename")
   @Header("Accept-Ranges", "bytes")

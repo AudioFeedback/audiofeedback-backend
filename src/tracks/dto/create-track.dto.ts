@@ -8,7 +8,6 @@ export class CreateTrackDto {
   @IsNotEmpty()
   description: string;
   @IsArray()
-  @IsInt({ each: true })
   @IsOptional()
-  reviewerIds: number[];
+  reviewerIds: string[];
 }
