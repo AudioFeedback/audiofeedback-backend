@@ -6,6 +6,7 @@ import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { UsersService } from "./users/users.service";
 import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { GetUserDto } from "./users/dto/get-user.dto";
+import { LoginDto } from "./dto/login.dto";
 
 @Controller()
 export class AppController {
@@ -31,7 +32,7 @@ export class AppController {
       },
     },
   })
-  async login(@Request() req) {
+  async login(@Request() req): Promise<LoginDto> {
     return this.authService.login(req.user);
   }
 
