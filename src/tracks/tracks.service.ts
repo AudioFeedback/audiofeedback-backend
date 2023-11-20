@@ -44,63 +44,91 @@ export class TracksService {
   }
 
   async create(createTrackDto: CreateTrackDto, user: User) {
-    const reviewers = await this.prisma.user.findMany({
+    const reviewerIds = this.csvStringToNumberedArray(
+      createTrackDto.reviewerIds,
+    );
+
+    if (reviewerIds.length > 0) {
+      this.throwErrorIfInvalidUsers(reviewerIds);
+
+      return this.createWithReviewers(createTrackDto, user, reviewerIds);
+    }
+
+    return this.createWithoutReviewer(createTrackDto, user);
+  }
+
+  private async throwErrorIfInvalidUsers(reviewerIds: number[]) {
+    const reviewers = await this.getReviewers();
+    if (!reviewerIds.every((x) => reviewers.map((x) => x.id).includes(x))) {
+      throw new NotFoundException(
+        "Invalid user(s) or role specified for reviewers.",
+      );
+    }
+  }
+
+  private csvStringToNumberedArray(
+    commaSeperatedArrayString: string | undefined,
+  ) {
+    if (commaSeperatedArrayString) {
+      return commaSeperatedArrayString.split(",").map((x) => Number(x));
+    }
+    return [];
+  }
+
+  private async getReviewers() {
+    return await this.prisma.user.findMany({
       where: {
         roles: {
           has: "FEEDBACKGEVER",
         },
       },
     });
+  }
 
-    const reviewerIds = createTrackDto.reviewerIds.split(",");
+  private async createWithReviewers(
+    createTrackDto: CreateTrackDto,
+    user: User,
+    reviewerIds: number[],
+  ) {
+    return await this.prisma.track.create({
+      data: {
+        title: createTrackDto.title,
+        genre: createTrackDto.genre,
+        author: {
+          connect: { id: user.id },
+        },
+        reviewers: {
+          connect: reviewerIds
+            .map((x) => x)
+            .map((id) => {
+              return { id: id };
+            }),
+        },
+      },
+      include: {
+        author: true,
+        reviewers: true,
+      },
+    });
+  }
 
-    if (reviewerIds.length > 0) {
-      if (
-        !createTrackDto.reviewerIds
-          .split(",")
-          .map((x) => Number(x))
-          .every((x) => reviewers.map((x) => x.id).includes(x))
-      ) {
-        throw new NotFoundException(
-          "Invalid user(s) or role specified for reviewers.",
-        );
-      }
-
-      return await this.prisma.track.create({
-        data: {
-          title: createTrackDto.title,
-          genre: createTrackDto.genre,
-          author: {
-            connect: { id: Number(user.id) },
-          },
-          reviewers: {
-            connect: reviewerIds
-              .map((x) => Number(x))
-              .map((id) => {
-                return { id: id };
-              }),
-          },
+  private async createWithoutReviewer(
+    createTrackDto: CreateTrackDto,
+    user: User,
+  ) {
+    return await this.prisma.track.create({
+      data: {
+        title: createTrackDto.title,
+        genre: createTrackDto.genre,
+        author: {
+          connect: { id: Number(user.id) },
         },
-        include: {
-          author: true,
-          reviewers: true,
-        },
-      });
-    } else {
-      return await this.prisma.track.create({
-        data: {
-          title: createTrackDto.title,
-          genre: createTrackDto.genre,
-          author: {
-            connect: { id: Number(user.id) },
-          },
-        },
-        include: {
-          author: true,
-          reviewers: true,
-        },
-      });
-    }
+      },
+      include: {
+        author: true,
+        reviewers: true,
+      },
+    });
   }
 
   async findAll(user: User) {
