@@ -28,7 +28,7 @@ import {
   TrackVersionsService,
 } from "./trackversions.service";
 import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
-import { GetTrackDeepDto } from "./dto/get-track-deep-dto";
+import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 

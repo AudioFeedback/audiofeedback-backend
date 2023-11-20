@@ -25,6 +25,6 @@ export class GetFeedbackWithUserDto {
     this.rating = feedback.rating;
     this.comment = feedback.comment;
     this.timestamp = feedback.timestamp;
-    this.user = feedback.user;
+    this.user = new GetUserDto(feedback.user);
   }
 }
