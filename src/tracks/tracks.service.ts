@@ -63,27 +63,44 @@ export class TracksService {
       );
     }
 
-    return await this.prisma.track.create({
-      data: {
-        title: createTrackDto.title,
-        genre: createTrackDto.genre,
-        author: {
-          connect: { id: Number(user.id) },
+    const reviewerIds = createTrackDto.reviewerIds.split(",")
+
+    if(reviewerIds.length > 0) {
+      return await this.prisma.track.create({
+        data: {
+          title: createTrackDto.title,
+          genre: createTrackDto.genre,
+          author: {
+            connect: { id: Number(user.id) },
+          },
+          reviewers: {
+            connect: reviewerIds
+              .map((x) => Number(x))
+              .map((id) => {
+                return { id: id };
+              }),
+          },
         },
-        reviewers: {
-          connect: createTrackDto.reviewerIds
-            .split(",")
-            .map((x) => Number(x))
-            .map((id) => {
-              return { id: id };
-            }),
+        include: {
+          author: true,
+          reviewers: true,
         },
-      },
-      include: {
-        author: true,
-        reviewers: true,
-      },
-    });
+      });
+    } else {
+      return await this.prisma.track.create({
+        data: {
+          title: createTrackDto.title,
+          genre: createTrackDto.genre,
+          author: {
+            connect: { id: Number(user.id) },
+          },
+        },
+        include: {
+          author: true,
+          reviewers: true,
+        },
+      });
+    }
   }
 
   async findAll(user: User) {
