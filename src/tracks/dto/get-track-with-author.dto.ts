@@ -4,7 +4,7 @@ import { GetUserDto } from "src/users/dto/get-user.dto";
 import { GetTrackVersionDto } from "./get-trackversion.dto";
 
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
-  include: { author: true },
+  include: { author: true, reviewers: true },
 });
 
 export type TrackWithAuthor = Prisma.TrackGetPayload<typeof trackWithAuthor>;
@@ -15,6 +15,7 @@ export class GetTrackWithAuthorDto {
   genre: string;
   trackversions: GetTrackVersionDto[];
   author: GetUserDto;
+  reviewers: GetUserDto[];
 
   constructor(
     track: TrackWithAuthor,
@@ -26,5 +27,6 @@ export class GetTrackWithAuthorDto {
     this.genre = track.genre;
     this.trackversions = [new GetTrackVersionDto(trackVersion, req)];
     this.author = new GetUserDto(track.author);
+    this.reviewers = track.reviewers.map(x => new GetUserDto(x));
   }
 }

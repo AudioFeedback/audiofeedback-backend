@@ -31,8 +31,6 @@ import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions
 import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
-// import { GetUserDto } from "src/users/dto/get-user.dto";
-import { GetTrackDto } from "./dto/get-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -53,8 +51,12 @@ export class TracksController {
       properties: {
         title: { type: "string" },
         genre: { type: "string" },
-        description: { type: "string" },
-        reviewerIds: { type: "array", items: { type: "number" } },
+        reviewerIds: {
+          type: "array",
+          items: {
+            type: "integer",
+          },
+        },
         file: {
           type: "string",
           format: "binary",
@@ -62,25 +64,25 @@ export class TracksController {
       },
     },
   })
-  
-  
   async create(
     @Body() createTrackDto: CreateTrackDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
+    const track = await this.tracksService.create(
+      createTrackDto,
+      <User>req.user,
+    );
+
     const fileData = await this.tracksService.saveFile(file);
 
     if (!fileData) {
+      // Todo: delete the created track
       throw new HttpException(
         "Error in het opslaan van het bestand.",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    const track = await this.tracksService.create(
-      createTrackDto,
-      <User>req.user,
-    );
 
     const trackVersionData: TrackVersionData = {
       id: track.id,
@@ -171,7 +173,7 @@ export class TracksController {
   // @Post('reviewers')
   // async createTrack(
   // @Req() req: Request,
-  // @Body() 
+  // @Body()
   // createTrackDto: CreateTrackDto
   // ) {
   //   const trackWithReviewer = await this.tracksService.create(

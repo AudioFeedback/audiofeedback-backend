@@ -48,8 +48,6 @@ export class TracksService {
     createTrackDto: CreateTrackDto,
     user: User,
   ): Promise<TrackWithAuthor> {
-    const { reviewerIds, ...trackData } = createTrackDto;
-
     const reviewers = await this.prisma.user.findMany({
       where: {
         roles: {
@@ -58,7 +56,12 @@ export class TracksService {
       },
     });
 
-    if (reviewers.length !== reviewerIds.length) {
+    if (
+      !createTrackDto.reviewerIds
+        .split(",")
+        .map((x) => Number(x))
+        .every((x) => reviewers.map((x) => x.id).includes(x))
+    ) {
       throw new NotFoundException(
         "Invalid user(s) or role specified for reviewers.",
       );
@@ -66,16 +69,23 @@ export class TracksService {
 
     return await this.prisma.track.create({
       data: {
-        ...trackData,
+        title: createTrackDto.title,
+        genre: createTrackDto.genre,
         author: {
           connect: { id: Number(user.id) },
         },
         reviewers: {
-          connect: reviewerIds.map((id) => Number(id)),
+          connect: createTrackDto.reviewerIds
+            .split(",")
+            .map((x) => Number(x))
+            .map((id) => {
+              return { id: id };
+            }),
         },
       },
       include: {
         author: true,
+        reviewers: true,
       },
     });
   }
@@ -115,6 +125,7 @@ export class TracksService {
     return this.prisma.track.findUnique({
       where: { id: id },
       include: {
+        reviewers: true,
         trackVersions: {
           include: {
             feedback: {
