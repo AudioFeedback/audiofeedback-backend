@@ -1,7 +1,7 @@
-import { Feedback, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { Request } from "express";
 import { GetTrackVersionDto } from "./get-trackversion.dto";
-import { FeedbackWithUser, GetFeedbackWithUserDto } from "src/feedback/dto/get-feedback-with-user.dto";
+import { GetFeedbackWithUserDto } from "src/feedback/dto/get-feedback-with-user.dto";
 
 const trackVersionDeep = Prisma.validator<Prisma.TrackVersionDefaultArgs>()({
   include: {
