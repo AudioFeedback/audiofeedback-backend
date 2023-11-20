@@ -30,6 +30,7 @@ model TrackVersion {
   description   String
   guid          String
   filetype      String
+  duration      Int
   feedback      Feedback[]
   track         Track      @relation(fields: [trackId], references: [id])
 }

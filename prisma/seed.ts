@@ -63,7 +63,7 @@ function createRandomFeedback(): FeedbackData {
 
 async function addTrackToMusicProducer(user: User, trackData: TrackData) {
 
-  const {title, genre, versionNumber, description, guid, filetype} = trackData;
+  const {title, genre, versionNumber, description, guid, filetype, duration} = trackData;
 
   const track = await prisma.track.create({
     data: {
@@ -81,6 +81,7 @@ async function addTrackToMusicProducer(user: User, trackData: TrackData) {
       description: description,
       guid: guid,
       filetype: filetype,
+      duration: duration,
       track: {
         connect: track
       }
@@ -93,6 +94,7 @@ async function addTrackToMusicProducer(user: User, trackData: TrackData) {
       description: "Tweede versie is de beste versie",
       guid: guid,
       filetype: filetype,
+      duration: duration,
       track: {
         connect: track
       }
@@ -123,6 +125,7 @@ interface TrackData {
   description: string;
   guid: string;
   filetype: string;
+  duration: number;
 }
 
 interface FeedbackData {
@@ -140,6 +143,7 @@ const PhonHouseBeat: TrackData = {
   filetype: "mp3",
   versionNumber: 1,
   description: "Eerste versie van de track.",
+  duration: 100,
 }
 
 const WatrByYourSide: TrackData = {
@@ -149,6 +153,7 @@ const WatrByYourSide: TrackData = {
   filetype: "mp3",
   versionNumber: 1,
   description: "Eerste versie van de track.",
+  duration: 194,
 }
 
 const FuturisticBeat: TrackData = {
@@ -158,6 +163,7 @@ const FuturisticBeat: TrackData = {
   filetype: "mp3",
   versionNumber: 1,
   description: "Eerste versie van de track.",
+  duration: 121,
 }
 
 const Embrace: TrackData = {
@@ -167,6 +173,7 @@ const Embrace: TrackData = {
   filetype: "mp3",
   versionNumber: 1,
   description: "Eerste versie van de track.",
+  duration: 179,
 }
 
 const ModernVlog: TrackData = {
@@ -176,6 +183,7 @@ const ModernVlog: TrackData = {
   filetype: "mp3",
   versionNumber: 1,
   description: "Eerste versie van de track.",
+  duration: 139,
 }
 
 main()

@@ -1,5 +1,6 @@
 import { Feedback, Prisma } from "@prisma/client";
 import { Request } from "express";
+import { GetTrackVersionDto } from "./get-trackversion.dto";
 
 const trackVersionDeep = Prisma.validator<Prisma.TrackVersionDefaultArgs>()({
   include: {
@@ -15,30 +16,11 @@ export type TrackVersionDeep = Prisma.TrackVersionGetPayload<
   typeof trackVersionDeep
 >;
 
-export class GetTrackVersionDeepDto {
-  id: number;
-  createdAt: Date;
-  updatedAt: Date;
-  timestamp: number;
-  trackId: number;
-  versionNumber: number;
-  description: string;
-  guid: string;
-  filetype: string;
-  fullUrl: string;
+export class GetTrackVersionDeepDto extends GetTrackVersionDto {
   feedback: Feedback[];
 
   constructor(trackVersion: TrackVersionDeep, req: Request) {
-    this.id = trackVersion.id;
-    this.createdAt = trackVersion.createdAt;
-    this.updatedAt = trackVersion.updatedAt;
-    this.versionNumber = trackVersion.versionNumber;
-    this.description = trackVersion.description;
-    this.guid = trackVersion.guid;
-    this.filetype = trackVersion.filetype;
-    this.fullUrl = `${req.get("Host")}/tracks/audio/${trackVersion.guid}.${
-      trackVersion.filetype
-    }`;
+    super(trackVersion, req);
     this.feedback = trackVersion.feedback;
   }
 }

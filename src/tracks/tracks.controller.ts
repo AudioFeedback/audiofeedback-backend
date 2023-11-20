@@ -85,6 +85,7 @@ export class TracksController {
       filetype: fileData.filetype,
       description: "Eerste versie van de track.",
       versionNumber: 1,
+      duration: fileData.duration,
     };
 
     const trackVersion =
@@ -138,6 +139,7 @@ export class TracksController {
       description: createTrackDto.description,
       versionNumber:
         Math.max(...track.trackVersions.map((x) => x.versionNumber)) + 1,
+      duration: fileData.duration,
     };
 
     const trackVersion =
