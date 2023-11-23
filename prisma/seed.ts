@@ -26,6 +26,8 @@ async function main() {
 
   await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[0], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[0], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[0], feedbackgever1)

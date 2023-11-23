@@ -179,6 +179,9 @@ export class TracksService {
         trackVersions: {
           include: {
             feedback: {
+              orderBy: {
+                timestamp: "asc"
+              },
               include: {
                 user: true,
               },
@@ -202,6 +205,9 @@ export class TracksService {
           take: 1,
           include: {
             feedback: {
+              orderBy: {
+                timestamp: "asc"
+              },
               where: {
                 user: {
                   id: reviewer.id,
