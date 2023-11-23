@@ -201,7 +201,7 @@ export class TracksController {
   @ApiBearerAuth()
   @Roles(Role.FEEDBACKGEVER)
   async getReviewTrack(@Param("id") id: number, @Req() req: Request) {
-    const tracks = await this.tracksService.getReviewable(<User>req.user);
+    const tracks = await this.tracksService.findAll(<User>req.user);
     if (!tracks.map((x) => x.id).includes(+id)) {
       throw new HttpException("Unauthorized track", HttpStatus.UNAUTHORIZED);
     }
