@@ -66,6 +66,7 @@ export class UsersController {
   }
 
   @Get("reviewers")
+  @Roles(Role.MUZIEKPRODUCER)
   async getReviewers() {
     const reviewers = await this.usersService.getReviewers();
     return reviewers.map((x) => new GetUserDto(x));
