@@ -7,7 +7,7 @@ export class GetFeedbackDto {
   isPublished: boolean;
   rating: boolean;
   timestamp: number;
-  trackId: number;
+  trackVersionId: number;
   comment: string;
 
   constructor(feedback: Feedback) {
@@ -18,6 +18,6 @@ export class GetFeedbackDto {
     this.rating = feedback.rating;
     this.comment = feedback.comment;
     this.timestamp = feedback.timestamp;
-    this.trackId = feedback.trackId;
+    this.trackVersionId = feedback.trackVersionId;
   }
 }

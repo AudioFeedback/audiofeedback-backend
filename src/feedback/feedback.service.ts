@@ -19,7 +19,7 @@ export class FeedbackService {
         user: {
           connect: { id: Number(user.id) },
         },
-        track: {
+        trackVersion: {
           connect: { id: Number(trackVersion.id) },
         },
       },
@@ -35,7 +35,7 @@ export class FeedbackService {
   async findAll(trackVersionId: number, user: User) {
     return this.prisma.feedback.findMany({
       where: {
-        trackId: trackVersionId,
+        trackVersionId: trackVersionId,
         userId: user.id,
       },
     });
@@ -45,13 +45,19 @@ export class FeedbackService {
     return `This action returns a #${id} feedback`;
   }
 
-  async update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
+  async update(id: number, updateFeedbackDto: UpdateFeedbackDto, user: User) {
     const existingFeedback = await this.prisma.feedback.findUnique({
-      where: { id },
+      where: {
+        id: id,
+        userId: user.id,
+        NOT: {
+          isPublished: true,
+        },
+      },
     });
 
     if (!existingFeedback) {
-      throw new NotFoundException("Feedback with ID ${id} not found");
+      throw new NotFoundException(`Feedback with ID ${id} not found`);
     }
 
     const updatedFeedback = await this.prisma.feedback.update({
@@ -76,7 +82,7 @@ export class FeedbackService {
   async publishFeedback(trackId: number, user: User) {
     return this.prisma.feedback.updateMany({
       where: {
-        trackId: trackId,
+        trackVersionId: trackId,
         userId: user.id,
       },
       data: {

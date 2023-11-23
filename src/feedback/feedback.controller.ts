@@ -71,8 +71,13 @@ export class FeedbackController {
   async update(
     @Param("id") id: number,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
+    @Req() req: Request,
   ) {
-    return await this.feedbackService.update(+id, updateFeedbackDto);
+    return await this.feedbackService.update(
+      +id,
+      updateFeedbackDto,
+      <User>req.user,
+    );
   }
 
   @Patch("publish/:trackVersionId")

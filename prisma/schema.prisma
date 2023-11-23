@@ -59,9 +59,9 @@ model Feedback {
   rating      Boolean
   comment     String
   userId      Int
-  trackId     Int
+  trackVersionId     Int
   user        User         @relation(fields: [userId], references: [id])
-  track       TrackVersion @relation(fields: [trackId], references: [id])
+  trackVersion       TrackVersion @relation(fields: [trackVersionId], references: [id])
 }
 
 enum Role {

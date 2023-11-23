@@ -125,7 +125,7 @@ function addFeedbackToTrack(feedback: FeedbackData, track: TrackVersion, user: U
   return prisma.feedback.create({
     data: {
       ...feedback,
-      track: {
+      trackVersion: {
         connect: track
       },
       user: {
