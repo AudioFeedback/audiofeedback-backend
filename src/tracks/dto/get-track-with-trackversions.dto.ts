@@ -1,6 +1,5 @@
 import { Prisma } from "@prisma/client";
 import { Request } from "express";
-import { GetUserDto } from "src/users/dto/get-user.dto";
 import { GetTrackVersionDto } from "./get-trackversion.dto";
 
 const trackWithTrackVersions = Prisma.validator<Prisma.TrackDefaultArgs>()({
@@ -16,7 +15,6 @@ export class GetTrackWithTrackVersionsDto {
   title: string;
   genre: string;
   trackversions: GetTrackVersionDto[];
-  author: GetUserDto;
 
   constructor(track: TrackWithTrackVersions, req: Request) {
     this.id = track.id;

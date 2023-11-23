@@ -27,7 +27,6 @@ import {
   TrackVersionData,
   TrackVersionsService,
 } from "./trackversions.service";
-import { GetTrackWithTrackVersionsDto } from "./dto/get-track-with-trackversions.dto";
 import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
@@ -163,7 +162,7 @@ export class TracksController {
     const tracks = await this.tracksService.findAll(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithTrackVersionsDto(x, req);
+      return new GetTrackWithAuthorDto(x);
     });
   }
 
@@ -195,15 +194,6 @@ export class TracksController {
   async findOne(@Param("id") id: number, @Req() req: Request) {
     const track = await this.tracksService.findOneDeep(+id);
     return new GetTrackDeepDto(track, req);
-  }
-
-  @Get("review/reviewable")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiBearerAuth()
-  @Roles(Role.FEEDBACKGEVER)
-  async getReviewable(@Req() req: Request) {
-    const tracks = await this.tracksService.getReviewable(<User>req.user);
-    return tracks.map((x) => new GetTrackWithAuthorDto(x));
   }
 
   @Get("review/:id")

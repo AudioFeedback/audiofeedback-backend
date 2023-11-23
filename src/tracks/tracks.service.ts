@@ -132,14 +132,31 @@ export class TracksService {
   }
 
   async findAll(user: User) {
-    return this.prisma.track.findMany({
-      where: {
-        OR: [{ authorId: user.id }],
-      },
-      include: {
-        trackVersions: true,
-      },
-    });
+    if (user.roles.includes("MUZIEKPRODUCER")) {
+      return this.prisma.track.findMany({
+        include: {
+          author: true,
+        },
+        where: {
+          OR: [{ authorId: user.id }],
+        },
+      });
+    }
+
+    if (user.roles.includes("FEEDBACKGEVER")) {
+      return this.prisma.track.findMany({
+        include: {
+          author: true,
+        },
+        where: {
+          reviewers: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+      });
+    }
   }
 
   findOne(id: number) {
@@ -218,20 +235,5 @@ export class TracksService {
     const rootDir = process.cwd();
     const mp3FilePath = path.join(rootDir, "audio", filename);
     return readFileSync(mp3FilePath, null);
-  }
-
-  async getReviewable(user: User) {
-    return this.prisma.track.findMany({
-      include: {
-        author: true,
-      },
-      where: {
-        reviewers: {
-          some: {
-            id: user.id,
-          },
-        },
-      },
-    });
   }
 }
