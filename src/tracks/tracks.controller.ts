@@ -32,6 +32,7 @@ import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 import { GetTrackWithAuthorAndReviewersDto } from "./dto/get-track-with-author-and-reviewers.dto";
+import { GetReviewTrackDto } from "./dto/get-review-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -196,13 +197,30 @@ export class TracksController {
     return new GetTrackDeepDto(track, req);
   }
 
-  @Get("reviewer/reviewable")
+  @Get("review/reviewable")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.FEEDBACKGEVER)
   async getReviewable(@Req() req: Request) {
     const tracks = await this.tracksService.getReviewable(<User>req.user);
     return tracks.map((x) => new GetTrackWithAuthorDto(x));
+  }
+
+  @Get("review/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.FEEDBACKGEVER)
+  async getReviewTrack(@Param("id") id: number, @Req() req: Request) {
+    const tracks = await this.tracksService.getReviewable(<User>req.user);
+    if (!tracks.map((x) => x.id).includes(+id)) {
+      throw new HttpException("Unauthorized track", HttpStatus.UNAUTHORIZED);
+    }
+
+    const track = await this.tracksService.findOneDeepReviewer(
+      +id,
+      <User>req.user,
+    );
+    return new GetReviewTrackDto(track, req);
   }
 
   // @Patch(':id')

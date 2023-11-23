@@ -148,6 +148,12 @@ export class TracksService {
     });
   }
 
+  findOneTrackVersion(id: number) {
+    return this.prisma.trackVersion.findUnique({
+      where: { id: id },
+    });
+  }
+
   findOneDeep(id: number) {
     return this.prisma.track.findUnique({
       where: { id: id },
@@ -158,6 +164,31 @@ export class TracksService {
             feedback: {
               include: {
                 user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  findOneDeepReviewer(id: number, reviewer: User) {
+    return this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        trackVersions: {
+          orderBy: {
+            versionNumber: "desc",
+          },
+          take: 1,
+          include: {
+            feedback: {
+              where: {
+                user: {
+                  id: reviewer.id,
+                },
               },
             },
           },

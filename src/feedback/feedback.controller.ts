@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
@@ -37,37 +36,65 @@ export class FeedbackController {
     @Body() createFeedbackDto: CreateFeedbackDto,
     @Req() req: Request,
   ) {
-    const track = await this.trackService.findOne(createFeedbackDto.trackId);
+    const trackVersion = await this.trackService.findOneTrackVersion(
+      createFeedbackDto.trackVersionId,
+    );
     const feedback = await this.feedbackService.create(
       createFeedbackDto,
       <User>req.user,
-      track,
+      trackVersion,
     );
     return new GetFeedbackDto(feedback);
   }
 
-  @Get()
-  async findAll() {
-    const feedback = await this.feedbackService.findAll();
-    return feedback.map((x) => new GetFeedbackDto(x));
-  }
+  // @Get()
+  // @Roles(Role.FEEDBACKGEVER)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @ApiBearerAuth()
+  // async findAll() {
+  //   const feedback = await this.feedbackService.findAll();
+  //   return feedback.map((x) => new GetFeedbackDto(x));
+  // }
 
-  @Get(":id")
-  findOne(@Param("id") id: number) {
-    return this.feedbackService.findOne(+id);
-  }
+  // @Get(":id")
+  // @Roles(Role.FEEDBACKGEVER)
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @ApiBearerAuth()
+  // findOne(@Param("id") id: number) {
+  //   return this.feedbackService.findOne(+id);
+  // }
 
   @Patch(":id")
   @Roles(Role.FEEDBACKGEVER)
-  update(
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  async update(
     @Param("id") id: number,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
   ) {
-    return this.feedbackService.update(+id, updateFeedbackDto);
+    return await this.feedbackService.update(+id, updateFeedbackDto);
+  }
+
+  @Patch("publish/:trackVersionId")
+  @Roles(Role.FEEDBACKGEVER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  async publishFeedback(
+    @Param("trackVersionId") trackVersionId: number,
+    @Req() req: Request,
+  ) {
+    await this.feedbackService.publishFeedback(+trackVersionId, <User>req.user);
+    const feedback = await this.feedbackService.findAll(
+      +trackVersionId,
+      <User>req.user,
+    );
+    return feedback.map((x) => new GetFeedbackDto(x));
   }
 
   @Delete(":id")
   @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   remove(@Param("id") id: number) {
     return this.feedbackService.remove(+id);
   }

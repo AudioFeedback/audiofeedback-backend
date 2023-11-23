@@ -24,21 +24,33 @@ async function main() {
   const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog, [feedbackgever3]);
 
 
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever1)
-  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever1)
-  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever1)
-  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[0], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[0], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[0], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack[0], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack[1], feedbackgever1)
 
-  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever2)
-  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever2)
-  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[0], feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[1], feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack[0], feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack[1], feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[0], feedbackgever2)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever2)
 
 
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack, feedbackgever3)
-  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack, feedbackgever3)
-  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack, feedbackgever3)
-  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack, feedbackgever3)
-  await addFeedbackToTrack(createRandomFeedback(), ModernVlogTrack, feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[0], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[0], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[0], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[1], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack[0], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), EmbraceTrack[1], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), ModernVlogTrack[0], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), ModernVlogTrack[1], feedbackgever3)
 }
 
 
@@ -59,6 +71,7 @@ function createRandomFeedback(): FeedbackData {
     rating: fakerNL.datatype.boolean(),
     comment: fakerNL.lorem.lines({min: 1, max: 1}),
     timestamp: fakerNL.number.float({min: 0.1, precision: 0.01 }),
+    isPublished: true,
   }
 }
 
@@ -92,7 +105,7 @@ async function addTrackToMusicProducer(user: User, trackData: TrackData, reviewe
     }
   })
 
-  await prisma.trackVersion.create({
+  const secondTrackVersion = await prisma.trackVersion.create({
     data: {
       versionNumber: 2,
       description: "Tweede versie is de beste versie",
@@ -105,7 +118,7 @@ async function addTrackToMusicProducer(user: User, trackData: TrackData, reviewe
     }
   })
   
-  return firstTrackVersion;
+  return [firstTrackVersion, secondTrackVersion];
 }
 
 function addFeedbackToTrack(feedback: FeedbackData, track: TrackVersion, user: User) {
@@ -136,6 +149,7 @@ interface FeedbackData {
   rating: boolean;
   comment: string;
   timestamp: number;
+  isPublished: boolean;
 }
 
 // Zie folder discord, importeer deze in de folder /audio

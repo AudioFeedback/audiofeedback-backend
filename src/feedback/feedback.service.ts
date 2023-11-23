@@ -1,13 +1,16 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { FeedbackWithUser } from "./dto/get-feedback-with-user.dto";
 import { CreateFeedbackDto } from "./dto/create-feedback.dto";
-import { Track, User } from "@prisma/client";
+import { TrackVersion, User } from "@prisma/client";
 import { UpdateFeedbackDto } from "./dto/update-feedback.dto";
 
 @Injectable()
 export class FeedbackService {
-  async create(createFeedbackDto: CreateFeedbackDto, user: User, track: Track) {
+  async create(
+    createFeedbackDto: CreateFeedbackDto,
+    user: User,
+    trackVersion: TrackVersion,
+  ) {
     return await this.prisma.feedback.create({
       data: {
         rating: createFeedbackDto.rating,
@@ -17,7 +20,7 @@ export class FeedbackService {
           connect: { id: Number(user.id) },
         },
         track: {
-          connect: { id: Number(track.id) },
+          connect: { id: Number(trackVersion.id) },
         },
       },
     });
@@ -29,10 +32,11 @@ export class FeedbackService {
 
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<FeedbackWithUser[]> {
+  async findAll(trackVersionId: number, user: User) {
     return this.prisma.feedback.findMany({
-      include: {
-        user: true,
+      where: {
+        trackId: trackVersionId,
+        userId: user.id,
       },
     });
   }
@@ -67,5 +71,17 @@ export class FeedbackService {
     }
 
     return this.prisma.feedback.delete({ where: { id } });
+  }
+
+  async publishFeedback(trackId: number, user: User) {
+    return this.prisma.feedback.updateMany({
+      where: {
+        trackId: trackId,
+        userId: user.id,
+      },
+      data: {
+        isPublished: true,
+      },
+    });
   }
 }

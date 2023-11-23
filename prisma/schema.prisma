@@ -51,16 +51,17 @@ model User {
 }
 
 model Feedback {
-  id        Int          @id @default(autoincrement())
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  timestamp Float
-  rating    Boolean
-  comment   String
-  userId    Int
-  trackId   Int
-  user      User         @relation(fields: [userId], references: [id])
-  track     TrackVersion @relation(fields: [trackId], references: [id])
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  isPublished Boolean      @default(false)
+  timestamp   Float
+  rating      Boolean
+  comment     String
+  userId      Int
+  trackId     Int
+  user        User         @relation(fields: [userId], references: [id])
+  track       TrackVersion @relation(fields: [trackId], references: [id])
 }
 
 enum Role {
