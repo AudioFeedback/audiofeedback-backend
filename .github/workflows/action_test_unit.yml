@@ -19,9 +19,10 @@ jobs:
 
       - name: Setup env
         run: |
-          ls
-          mv example.env .env
-          ls
+          touch .env
+          echo DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/postgres?schema=public" >> .env
+          echo JWT_SECRET="generate secret string here" >> .env
+          cat .env
 
       - name: Run unit tests
         run: npm run test
