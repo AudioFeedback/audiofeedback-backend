@@ -180,7 +180,7 @@ export class TracksService {
           include: {
             feedback: {
               orderBy: {
-                timestamp: "asc"
+                timestamp: "asc",
               },
               include: {
                 user: true,
@@ -206,7 +206,7 @@ export class TracksService {
           include: {
             feedback: {
               orderBy: {
-                timestamp: "asc"
+                timestamp: "asc",
               },
               where: {
                 user: {
