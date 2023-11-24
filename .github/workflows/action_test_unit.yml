@@ -24,6 +24,8 @@ jobs:
           echo JWT_SECRET="generate secret string here" >> .env
           cat .env
 
+      - run: ls
+
       - name: Run unit tests
         run: npm run test
 
