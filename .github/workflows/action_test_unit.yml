@@ -18,9 +18,13 @@ jobs:
         run: npm install
 
       - name: Run unit tests
+        env:
+          JWT_SECRET: "generate secret string here"
         run: npm run test
 
       - name: Run coverage
+        env:
+          JWT_SECRET: "generate secret string here"
         run: npm run test:coverage
 
       - name: Publish Test Report
