@@ -1,4 +1,4 @@
-name: Test build
+name: Test unit
 
 on: [ workflow_call ]
 
@@ -18,7 +18,10 @@ jobs:
         run: npm install
 
       - name: Setup env
-        run: mv example.env .env
+        run: |
+          ls
+          mv example.env .env
+          ls
 
       - name: Run unit tests
         run: npm run test
