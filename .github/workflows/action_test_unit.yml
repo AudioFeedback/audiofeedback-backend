@@ -25,7 +25,7 @@ jobs:
       - name: Run coverage
         env:
           JWT_SECRET: "generate secret string here"
-        run: npm run test:coverage
+        run: npm run test:cov
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
