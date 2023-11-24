@@ -90,9 +90,13 @@ export class FeedbackController {
     @Param("trackVersionId") trackVersionId: number,
     @Req() req: Request,
   ) {
-    const res = await this.feedbackService.publishFeedback(+trackVersionId, <User>req.user);
+    const res = await this.feedbackService.publishFeedback(
+      +trackVersionId,
+      <User>req.user,
+    );
 
-    if(res.count < 1) throw new HttpException("Feedback niet gevonden.", HttpStatus.NOT_FOUND);
+    if (res.count < 1)
+      throw new HttpException("Feedback niet gevonden.", HttpStatus.NOT_FOUND);
 
     const feedback = await this.feedbackService.findAll(
       +trackVersionId,

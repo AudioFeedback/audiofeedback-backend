@@ -1,21 +1,21 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { FeedbackService } from "./feedback.service";
-import { PrismaService } from "src/prisma.service";
-import { TracksService } from "src/tracks/tracks.service";
+import { TracksService } from "./tracks.service";
 import { mockDeep } from "jest-mock-extended";
+import { PrismaService } from "src/prisma.service";
+import { TrackVersionsService } from "./trackversions.service";
 
-describe("FeedbackService", () => {
-  let service: FeedbackService;
+describe("TracksversionService", () => {
+  let service: TrackVersionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FeedbackService, PrismaService, TracksService],
+      providers: [TracksService, TrackVersionsService, PrismaService],
     })
       .overrideProvider(PrismaService)
       .useValue(mockDeep<PrismaService>())
       .compile();
 
-    service = module.get<FeedbackService>(FeedbackService);
+    service = module.get<TrackVersionsService>(TrackVersionsService);
   });
 
   it("should be defined", () => {

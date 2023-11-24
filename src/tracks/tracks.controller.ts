@@ -194,7 +194,11 @@ export class TracksController {
   async findOne(@Param("id") id: number, @Req() req: Request) {
     const track = await this.tracksService.findOneDeep(+id);
 
-    if(!track) throw new HttpException(`Track with ID:${id} not found`, HttpStatus.NOT_FOUND)
+    if (!track)
+      throw new HttpException(
+        `Track with ID:${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
     return new GetTrackDeepDto(track, req);
   }
 
