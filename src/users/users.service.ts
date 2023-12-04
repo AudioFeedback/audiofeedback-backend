@@ -50,10 +50,10 @@ export class UsersService {
       where: {
         reviewable: {
           some: {
-            id: id
-          }
-        }
-      }
-    })
+            id: id,
+          },
+        },
+      },
+    });
   }
 }

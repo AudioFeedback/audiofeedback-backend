@@ -104,7 +104,7 @@ export class TracksController {
 
     return new GetTrackWithAuthorAndReviewersDto(track, trackVersion, req);
   }
-  
+
   @Post("/:trackId")
   @Roles(Role.MUZIEKPRODUCER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -230,14 +230,17 @@ export class TracksController {
   @Roles(Role.MUZIEKPRODUCER)
   async getAssignedReviewers(@Param("id") id: number) {
     const reviewers = await this.usersService.getAssignedReviewers(+id);
-    return reviewers.map(x=>new GetUserDto(x));
+    return reviewers.map((x) => new GetUserDto(x));
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
-  @Patch(':id/reviewers')
-  async updateReviewers(@Param('id') id: string, @Body() updateTrackReviewersDto: UpdateTrackReviewersDto) {
+  @Patch(":id/reviewers")
+  async updateReviewers(
+    @Param("id") id: string,
+    @Body() updateTrackReviewersDto: UpdateTrackReviewersDto,
+  ) {
     await this.tracksService.updateReviewers(+id, updateTrackReviewersDto);
     return true;
   }
