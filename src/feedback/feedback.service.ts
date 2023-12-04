@@ -15,7 +15,9 @@ export class FeedbackService {
       data: {
         rating: createFeedbackDto.rating,
         comment: createFeedbackDto.comment,
-        timestamp: createFeedbackDto.timestamp,
+        timestamp: createFeedbackDto.timestamp
+          ? createFeedbackDto.timestamp
+          : null,
         user: {
           connect: { id: Number(user.id) },
         },
