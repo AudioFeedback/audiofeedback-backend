@@ -6,6 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { User } from "@prisma/client";
 import * as mm from "music-metadata";
+import { UpdateFeedbackDto } from "src/feedback/dto/update-feedback.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 
 @Injectable()
 export class TracksService {
@@ -229,10 +232,35 @@ export class TracksService {
     });
   }
 
-  update(id: number) {
-    return `This action updates a #${id} track`;
-  }
+  async updateReviewers(
+    id: number,
+    updateTrackReviewersDto: UpdateTrackReviewersDto,
+    // reviewerIds: number[],
+    ) {
+    const existingTrack = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    })
 
+    if (!existingTrack) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    // console.log(reviewerIds);
+    return await this.prisma.track.update({
+      where: { id },
+      data: {
+        reviewers: {
+          connect: updateTrackReviewersDto.reviewerIds
+            .map((x) => x)
+            .map((id) => {
+              return { id: id };
+            }),
+        },
+      },
+    });
+  }
+  
   remove(id: number) {
     return `This action removes a #${id} track`;
   }

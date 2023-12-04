@@ -44,4 +44,16 @@ export class UsersService {
       },
     });
   }
+
+  async getAssignedReviewers(id: number) {
+    return this.prisma.user.findMany({
+      where: {
+        reviewable: {
+          some: {
+            id: id
+          }
+        }
+      }
+    })
+  }
 }
