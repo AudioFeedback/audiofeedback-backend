@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { User } from "@prisma/client";
 import * as mm from "music-metadata";
+// import { UpdateTrackDto } from "./dto/update-track.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 
 @Injectable()
 export class TracksService {
@@ -165,9 +167,18 @@ export class TracksService {
     });
   }
 
-  findOneTrackVersion(id: number) {
+  findOneTrackVersion(user: User, id: number) {
     return this.prisma.trackVersion.findUnique({
-      where: { id: id },
+      where: {
+        id: id,
+        track: {
+          reviewers: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+      },
     });
   }
 
@@ -229,8 +240,31 @@ export class TracksService {
     });
   }
 
-  update(id: number) {
-    return `This action updates a #${id} track`;
+  async updateReviewers(
+    id: number,
+    updateTrackReviewersDto: UpdateTrackReviewersDto,
+  ) {
+    const existingTrack = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existingTrack) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    return await this.prisma.track.update({
+      where: { id },
+      data: {
+        reviewers: {
+          connect: updateTrackReviewersDto.reviewerIds
+            .map((x) => x)
+            .map((id) => {
+              return { id: id };
+            }),
+        },
+      },
+    });
   }
 
   remove(id: number) {

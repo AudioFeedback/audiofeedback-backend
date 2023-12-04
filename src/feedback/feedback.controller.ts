@@ -39,8 +39,16 @@ export class FeedbackController {
     @Req() req: Request,
   ) {
     const trackVersion = await this.trackService.findOneTrackVersion(
+      <User>req.user,
       createFeedbackDto.trackVersionId,
     );
+
+    if (!trackVersion)
+      throw new HttpException(
+        "Track version niet gevonden.",
+        HttpStatus.NOT_FOUND,
+      );
+
     const feedback = await this.feedbackService.create(
       createFeedbackDto,
       <User>req.user,
