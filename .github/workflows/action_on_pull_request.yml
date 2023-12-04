@@ -1,0 +1,21 @@
+name: Pull Request
+
+on: [ pull_request ]
+
+jobs:
+  linting:
+    uses: ./.github/workflows/action_linting.yml
+
+  test-build:
+    needs: [ linting ]
+    uses: ./.github/workflows/action_test_build.yml
+
+  test-unit:
+    uses: ./.github/workflows/action_test_unit.yml
+
+  sonarcloud:
+    uses: ./.github/workflows/action_run_sonarcloud.yml
+    needs: [ test-unit ]
+    secrets:
+      github: ${{ secrets.GITHUB_TOKEN }}
+      sonar: ${{ secrets.SONAR_TOKEN }}

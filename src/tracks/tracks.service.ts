@@ -168,9 +168,15 @@ export class TracksService {
     });
   }
 
-  findOneTrackVersion(id: number) {
+  findOneTrackVersion(user: User, id: number) {
     return this.prisma.trackVersion.findUnique({
-      where: { id: id },
+      where: { id: id, track: {
+        reviewers: {
+          some: {
+            id: user.id
+          }
+        }
+      }},
     });
   }
 
@@ -183,7 +189,7 @@ export class TracksService {
           include: {
             feedback: {
               orderBy: {
-                timestamp: "asc"
+                timestamp: "asc",
               },
               include: {
                 user: true,
@@ -209,7 +215,7 @@ export class TracksService {
           include: {
             feedback: {
               orderBy: {
-                timestamp: "asc"
+                timestamp: "asc",
               },
               where: {
                 user: {
