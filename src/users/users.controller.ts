@@ -49,29 +49,13 @@ export class UsersController {
     });
   }
 
-  // @Get(":id")
+  // @Patch(":id")
   // @UseGuards(JwtAuthGuard, RolesGuard)
   // @ApiBearerAuth()
   // @Roles(Role.ADMIN)
-  // findOne(@Param("id") id: string): Promise<User> {
-  //   return this.usersService.findOne({ id: Number(id) });
+  // update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.usersService.update(+id, updateUserDto);
   // }
-
-  @Patch(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiBearerAuth()
-  @Roles(Role.ADMIN)
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiBearerAuth()
-  @Roles(Role.ADMIN)
-  remove(@Param("id") id: string) {
-    return this.usersService.remove(+id);
-  }
 
   @Get("reviewers")
   @Roles(Role.MUZIEKPRODUCER)

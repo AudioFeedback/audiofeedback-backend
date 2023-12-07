@@ -7,6 +7,7 @@ import { TracksModule } from "./tracks/tracks.module";
 import { UsersModule } from "./users/users.module";
 import { FeedbackModule } from "./feedback/feedback.module";
 import { AuthModule } from "./auth/auth.module";
+import { LabelsModule } from "./labels/labels.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from "./auth/auth.module";
     UsersModule,
     FeedbackModule,
     AuthModule,
+    LabelsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

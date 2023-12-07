@@ -5,8 +5,8 @@ import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { UsersService } from "./users/users.service";
 import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
-import { GetUserDto } from "./users/dto/get-user.dto";
 import { LoginDto } from "./dto/login.dto";
+import { GetUserWithNotifications } from "./users/dto/get-user-with-notifications";
 
 @Controller()
 export class AppController {
@@ -43,6 +43,9 @@ export class AppController {
     const user = await this.userService.findOne({
       username: req.user.username,
     });
-    return new GetUserDto(user);
+
+    const notifications = await this.userService.getNotifications(user);
+
+    return new GetUserWithNotifications(user, notifications);
   }
 }

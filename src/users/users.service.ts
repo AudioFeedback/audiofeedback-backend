@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { Prisma } from "@prisma/client";
+import { InviteStatus, Prisma, User } from "@prisma/client";
 import { PrismaService } from "src/prisma.service";
 import { UserWithTrack } from "./dto/get-user-with-track.dto";
 
@@ -27,12 +26,17 @@ export class UsersService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user ${updateUserDto}`;
-  }
+  async getNotifications(user: User) {
+    const invites = await this.prisma.labelMember.findMany({
+      where: {
+        user: {
+          id: user.id,
+        },
+        status: InviteStatus.INVITED,
+      },
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return invites.length;
   }
 
   async getReviewers() {
