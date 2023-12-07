@@ -12,6 +12,7 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Patch,
 } from "@nestjs/common";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
@@ -32,6 +33,9 @@ import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
 import { GetTrackWithAuthorAndReviewersDto } from "./dto/get-track-with-author-and-reviewers.dto";
 import { GetReviewTrackDto } from "./dto/get-review-track.dto";
+import { UsersService } from "src/users/users.service";
+import { GetUserDto } from "src/users/dto/get-user.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -39,6 +43,7 @@ export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
     private readonly trackVersionsService: TrackVersionsService,
+    private readonly usersService: UsersService,
   ) {}
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
@@ -219,10 +224,26 @@ export class TracksController {
     return new GetReviewTrackDto(track, req);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-  //   return this.tracksService.update(+id, updateTrackDto);
-  // }
+  @Get(":id/assigned-reviewers")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  async getAssignedReviewers(@Param("id") id: number) {
+    const reviewers = await this.usersService.getAssignedReviewers(+id);
+    return reviewers.map((x) => new GetUserDto(x));
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
+  @Patch(":id/reviewers")
+  async updateReviewers(
+    @Param("id") id: string,
+    @Body() updateTrackReviewersDto: UpdateTrackReviewersDto,
+  ) {
+    await this.tracksService.updateReviewers(+id, updateTrackReviewersDto);
+    return true;
+  }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
