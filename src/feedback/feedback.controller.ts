@@ -44,7 +44,10 @@ export class FeedbackController {
     );
 
     if (!trackVersion)
-      throw new HttpException("Track version niet gevonden.", HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        "Track version niet gevonden.",
+        HttpStatus.NOT_FOUND,
+      );
 
     const feedback = await this.feedbackService.create(
       createFeedbackDto,

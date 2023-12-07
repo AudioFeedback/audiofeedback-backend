@@ -136,6 +136,18 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          trackVersions: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              feedback: {
+                where: {
+                  isPublished: true,
+                },
+              },
+            },
+          },
         },
         where: {
           OR: [{ authorId: user.id }],
@@ -147,6 +159,20 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          trackVersions: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              feedback: {
+                where: {
+                  user: {
+                    id: user.id,
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           reviewers: {
@@ -167,13 +193,16 @@ export class TracksService {
 
   findOneTrackVersion(user: User, id: number) {
     return this.prisma.trackVersion.findUnique({
-      where: { id: id, track: {
-        reviewers: {
-          some: {
-            id: user.id
-          }
-        }
-      }},
+      where: {
+        id: id,
+        track: {
+          reviewers: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+      },
     });
   }
 

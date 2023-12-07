@@ -26,6 +26,7 @@ model TrackVersion {
   id            Int        @id @default(autoincrement())
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+  isReviewed    Boolean    @default(false)
   trackId       Int
   versionNumber Int
   description   String
@@ -51,17 +52,17 @@ model User {
 }
 
 model Feedback {
-  id          Int          @id @default(autoincrement())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  isPublished Boolean      @default(false)
-  timestamp   Float
-  rating      Boolean
-  comment     String
-  userId      Int
-  trackVersionId     Int
-  user        User         @relation(fields: [userId], references: [id])
-  trackVersion       TrackVersion @relation(fields: [trackVersionId], references: [id])
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  isPublished    Boolean      @default(false)
+  timestamp      Float
+  rating         Boolean
+  comment        String
+  userId         Int
+  trackVersionId Int
+  user           User         @relation(fields: [userId], references: [id])
+  trackVersion   TrackVersion @relation(fields: [trackVersionId], references: [id])
 }
 
 enum Role {

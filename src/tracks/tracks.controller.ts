@@ -162,7 +162,7 @@ export class TracksController {
     const tracks = await this.tracksService.findAll(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorDto(x);
+      return new GetTrackWithAuthorDto(x, <User>req.user);
     });
   }
 
