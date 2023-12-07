@@ -38,17 +38,18 @@ model TrackVersion {
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  username   String     @unique
-  firstname  String
-  lastname   String
-  password   String
-  roles      Role[]
-  tracks     Track[]
-  feedback   Feedback[]
-  reviewable Track[]    @relation("reviewer")
+  id          Int           @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  username    String        @unique
+  firstname   String
+  lastname    String
+  password    String
+  roles       Role[]
+  tracks      Track[]
+  feedback    Feedback[]
+  reviewable  Track[]       @relation("reviewer")
+  LabelMember LabelMember[]
 }
 
 model Feedback {
@@ -56,7 +57,7 @@ model Feedback {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   isPublished    Boolean      @default(false)
-  timestamp      Float?     
+  timestamp      Float?
   rating         Boolean
   comment        String
   userId         Int
@@ -65,8 +66,33 @@ model Feedback {
   trackVersion   TrackVersion @relation(fields: [trackVersionId], references: [id])
 }
 
+model LabelMember {
+  id      Int          @id @default(autoincrement())
+  status  InviteStatus
+  labelId Int
+  userId  Int
+  label   Label        @relation(fields: [labelId], references: [id])
+  user    User         @relation(fields: [userId], references: [id])
+}
+
+model Label {
+  id             Int           @id @default(autoincrement())
+  name           String
+  websiteUrl     String
+  description    String
+  genre          String
+  profilePicture String?
+  LabelMember    LabelMember[]
+}
+
 enum Role {
   FEEDBACKGEVER
   MUZIEKPRODUCER
   ADMIN
+}
+
+enum InviteStatus {
+  INVITED
+  ACCEPTED
+  DECLINED
 }

@@ -14,7 +14,7 @@ async function main() {
 
   const musicProducer1 = await createRandomUser([Role.MUZIEKPRODUCER], "muziekproducer");
 
-  const PhonHouseBeatTrack = await addTrackToMusicProducer(musicProducer1, PhonHouseBeat, [feedbackgever1, feedbackgever3]);
+  const PerfectNight = await addTrackToMusicProducer(musicProducer1, PefectNight, [feedbackgever1, feedbackgever3]);
   const WatrByYourSideTrack = await addTrackToMusicProducer(musicProducer1, WatrByYourSide, [feedbackgever1, feedbackgever2, feedbackgever3]);
   const FuturisticBeatTrack = await addTrackToMusicProducer(musicProducer1, FuturisticBeat, [feedbackgever1, feedbackgever2, feedbackgever3]);
 
@@ -24,10 +24,10 @@ async function main() {
   const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog, [feedbackgever3]);
 
 
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[0], feedbackgever1)
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PerfectNight[0], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PerfectNight[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PerfectNight[1], feedbackgever1)
+  await addFeedbackToTrack(createRandomFeedback(), PerfectNight[1], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[0], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[0], feedbackgever1)
@@ -43,8 +43,8 @@ async function main() {
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever2)
 
 
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[0], feedbackgever3)
-  await addFeedbackToTrack(createRandomFeedback(), PhonHouseBeatTrack[1], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), PerfectNight[0], feedbackgever3)
+  await addFeedbackToTrack(createRandomFeedback(), PerfectNight[1], feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[0], feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), WatrByYourSideTrack[1], feedbackgever3)
   await addFeedbackToTrack(createRandomFeedback(), FuturisticBeatTrack[0], feedbackgever3)
@@ -156,14 +156,14 @@ interface FeedbackData {
 
 // Zie folder discord, importeer deze in de folder /audio
 
-const PhonHouseBeat: TrackData = {
-  title: "Phonk House Beat (You Wanna Play)",
-  genre: "Fonk",
-  guid: "phonk-house-beat-you-wanna-play-126321",
+const PefectNight: TrackData = {
+  title: "Perfect Night (Holiday Remix)",
+  genre: "2-step garage",
+  guid: "perfect-night-holiday-remix-143872",
   filetype: "mp3",
   versionNumber: 1,
   description: "Eerste versie van de track.",
-  duration: 100,
+  duration: 162,
 }
 
 const WatrByYourSide: TrackData = {
