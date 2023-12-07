@@ -138,6 +138,18 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          trackVersions: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              feedback: {
+                where: {
+                  isPublished: true,
+                },
+              },
+            },
+          },
         },
         where: {
           OR: [{ authorId: user.id }],
@@ -149,6 +161,20 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          trackVersions: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              feedback: {
+                where: {
+                  user: {
+                    id: user.id,
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           reviewers: {
