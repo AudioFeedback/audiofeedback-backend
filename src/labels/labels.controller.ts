@@ -59,4 +59,15 @@ export class LabelsController {
     const reviewers = await this.labelsService.getAvailableReviewers();
     return reviewers.map((x) => new GetUserDto(x));
   }
+
+
+  @Get("typeahead/:query")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN, Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER)
+  async getLabelTypeahead(@Param("query") query: string) {
+    const labels = await this.labelsService.getLabelTypeahead(query);
+
+    return labels.map((x) => new GetLabelDto(x));
+  }
 }

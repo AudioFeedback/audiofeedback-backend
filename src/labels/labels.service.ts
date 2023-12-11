@@ -65,4 +65,15 @@ export class LabelsService {
       },
     });
   }
+
+  async getLabelTypeahead(query: string) {
+    return this.prisma.label.findMany({
+      where: {
+        name: {
+          startsWith: query,
+          mode: "insensitive"
+        },
+      },
+    });
+  }
 }
