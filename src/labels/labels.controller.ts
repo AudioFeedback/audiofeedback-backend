@@ -7,6 +7,7 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { Request } from "express";
 import { GetLabelMemberWithLabelDto } from "./dto/get-labelmember-with-label.dto";
+import { GetUserDto } from "src/users/dto/get-user.dto";
 
 @ApiTags("labels")
 @Controller("labels")
@@ -21,5 +22,11 @@ export class LabelsController {
     const labelMembers = await this.labelsService.getInvites(<User>req.user);
 
     return labelMembers.map((x) => new GetLabelMemberWithLabelDto(x));
+  }
+
+  @Get("reviewers")
+  async getAvailableReviewers() {
+    const reviewers = await this.labelsService.getAvailableReviewers();
+    return reviewers.map((x) => new GetUserDto(x));
   }
 }

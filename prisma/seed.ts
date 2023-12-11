@@ -74,10 +74,10 @@ async function main() {
   await addUserToLabel(InviteStatus.INVITED, feedbackgever2, LabelLachendeNoten)
   await addUserToLabel(InviteStatus.ACCEPTED, feedbackgever2, LabelFunkFusie)
 
-  await addUserToLabel(InviteStatus.ACCEPTED, feedbackgever3, LabelSwingTijger)
-  await addUserToLabel(InviteStatus.INVITED, feedbackgever3, LabelBananenBeat)
-  await addUserToLabel(InviteStatus.ACCEPTED, feedbackgever3, LabelLachendeNoten)
-  await addUserToLabel(InviteStatus.INVITED, feedbackgever3, LabelFunkFusie)
+  // await addUserToLabel(InviteStatus.ACCEPTED, feedbackgever3, LabelSwingTijger)
+  // await addUserToLabel(InviteStatus.INVITED, feedbackgever3, LabelBananenBeat)
+  // await addUserToLabel(InviteStatus.ACCEPTED, feedbackgever3, LabelLachendeNoten)
+  // await addUserToLabel(InviteStatus.INVITED, feedbackgever3, LabelFunkFusie)
 
   await addFeedbackToTrack(createRandomFeedback(), PerfectNight[0], feedbackgever1)
   await addFeedbackToTrack(createRandomFeedback(), PerfectNight[1], feedbackgever1)
