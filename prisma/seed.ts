@@ -1,4 +1,4 @@
-import { InviteStatus, Label, PrismaClient, Role, Track, TrackVersion, User } from '@prisma/client'
+import { InviteStatus, Label, PrismaClient, Role, TrackVersion, User } from '@prisma/client'
 import { fakerNL } from '@faker-js/faker';
 
 const prisma = new PrismaClient()
@@ -234,7 +234,7 @@ async function addTrackToLabel(trackVersion: TrackVersion, label: Label) {
       id: track.id
     },
     data: {
-      labels: {
+      label: {
         connect: {id: label.id}
       }
     }

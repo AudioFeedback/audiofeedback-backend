@@ -1,28 +1,29 @@
 import { Prisma, TrackVersion } from "@prisma/client";
 import { Request } from "express";
 import { GetUserDto } from "src/users/dto/get-user.dto";
+import { GetLabelDto } from "../../labels/dto/get-label.dto";
 import { GetTrackVersionDto } from "./get-trackversion.dto";
 
-const trackWithAuthorAndReviewers = Prisma.validator<Prisma.TrackDefaultArgs>()(
-  {
-    include: { author: true, reviewers: true },
-  },
-);
+const trackWithLabelOrAuthorAndReviewers =
+  Prisma.validator<Prisma.TrackDefaultArgs>()({
+    include: { author: true, reviewers: true, label: true },
+  });
 
-export type TrackWithAuthorAndReviewers = Prisma.TrackGetPayload<
-  typeof trackWithAuthorAndReviewers
+export type TrackWithLabelOrAuthorAndReviewers = Prisma.TrackGetPayload<
+  typeof trackWithLabelOrAuthorAndReviewers
 >;
 
-export class GetTrackWithAuthorAndReviewersDto {
+export class GetTrackWithLabelOrReviewersAndAuthor {
   id: number;
   title: string;
   genre: string;
   trackversions: GetTrackVersionDto[];
   author: GetUserDto;
   reviewers: GetUserDto[];
+  label: GetLabelDto;
 
   constructor(
-    track: TrackWithAuthorAndReviewers,
+    track: TrackWithLabelOrAuthorAndReviewers,
     trackVersion: TrackVersion,
     req: Request,
   ) {
@@ -32,5 +33,6 @@ export class GetTrackWithAuthorAndReviewersDto {
     this.trackversions = [new GetTrackVersionDto(trackVersion, req)];
     this.author = new GetUserDto(track.author);
     this.reviewers = track.reviewers.map((x) => new GetUserDto(x));
+    this.label = track.label;
   }
 }

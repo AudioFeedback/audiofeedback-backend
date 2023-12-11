@@ -50,10 +50,16 @@ export class TracksService {
       createTrackDto.reviewerIds,
     );
 
+    const labelId = createTrackDto.labelId;
+
     if (reviewerIds.length > 0) {
       this.throwErrorIfInvalidUsers(reviewerIds);
 
       return this.createWithReviewers(createTrackDto, user, reviewerIds);
+    }
+
+    if (labelId) {
+      return this.createWithLabel(createTrackDto, user, labelId);
     }
 
     return this.createWithoutReviewer(createTrackDto, user);
@@ -92,7 +98,7 @@ export class TracksService {
     user: User,
     reviewerIds: number[],
   ) {
-    return await this.prisma.track.create({
+    return this.prisma.track.create({
       data: {
         title: createTrackDto.title,
         genre: createTrackDto.genre,
@@ -110,6 +116,7 @@ export class TracksService {
       include: {
         author: true,
         reviewers: true,
+        label: true,
       },
     });
   }
@@ -118,7 +125,7 @@ export class TracksService {
     createTrackDto: CreateTrackDto,
     user: User,
   ) {
-    return await this.prisma.track.create({
+    return this.prisma.track.create({
       data: {
         title: createTrackDto.title,
         genre: createTrackDto.genre,
@@ -129,6 +136,31 @@ export class TracksService {
       include: {
         author: true,
         reviewers: true,
+        label: true,
+      },
+    });
+  }
+
+  private async createWithLabel(
+    createTrackDto: CreateTrackDto,
+    user: User,
+    labelId: number,
+  ) {
+    return this.prisma.track.create({
+      data: {
+        title: createTrackDto.title,
+        genre: createTrackDto.genre,
+        author: {
+          connect: { id: Number(user.id) },
+        },
+        label: {
+          connect: { id: Number(labelId) },
+        },
+      },
+      include: {
+        author: true,
+        reviewers: true,
+        label: true,
       },
     });
   }

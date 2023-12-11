@@ -31,7 +31,7 @@ import {
 import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
-import { GetTrackWithAuthorAndReviewersDto } from "./dto/get-track-with-author-and-reviewers.dto";
+import { GetTrackWithLabelOrReviewersAndAuthor } from "./dto/get-track-with-label-or-reviewers-and.author";
 import { GetReviewTrackDto } from "./dto/get-review-track.dto";
 import { UsersService } from "src/users/users.service";
 import { GetUserDto } from "src/users/dto/get-user.dto";
@@ -45,6 +45,7 @@ export class TracksController {
     private readonly trackVersionsService: TrackVersionsService,
     private readonly usersService: UsersService,
   ) {}
+
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -63,6 +64,7 @@ export class TracksController {
             type: "integer",
           },
         },
+        labelId: { type: "number" },
         file: {
           type: "string",
           format: "binary",
@@ -75,6 +77,13 @@ export class TracksController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
+    if (createTrackDto.labelId && createTrackDto.reviewerIds) {
+      throw new HttpException(
+        "Both label & reviewers provided",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const track = await this.tracksService.create(
       createTrackDto,
       <User>req.user,
@@ -102,7 +111,7 @@ export class TracksController {
     const trackVersion =
       await this.trackVersionsService.create(trackVersionData);
 
-    return new GetTrackWithAuthorAndReviewersDto(track, trackVersion, req);
+    return new GetTrackWithLabelOrReviewersAndAuthor(track, trackVersion, req);
   }
 
   @Post("/:trackId")
@@ -199,11 +208,12 @@ export class TracksController {
   async findOne(@Param("id") id: number, @Req() req: Request) {
     const track = await this.tracksService.findOneDeep(+id);
 
-    if (!track)
+    if (!track) {
       throw new HttpException(
         `Track with ID:${id} not found`,
         HttpStatus.NOT_FOUND,
       );
+    }
     return new GetTrackDeepDto(track, req);
   }
 

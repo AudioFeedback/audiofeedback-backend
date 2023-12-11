@@ -19,8 +19,9 @@ model Track {
   authorId      Int
   trackVersions TrackVersion[]
   reviewers     User[]         @relation("reviewer")
-  labels        Label[]
+  label         Label?         @relation(fields: [labelId], references: [id])
   author        User           @relation(fields: [authorId], references: [id])
+  labelId       Int?
 }
 
 model TrackVersion {

@@ -7,7 +7,7 @@ export class LabelsService {
   constructor(private prisma: PrismaService) {}
 
   async getInvites(user: User) {
-    return await this.prisma.labelMember.findMany({
+    return this.prisma.labelMember.findMany({
       where: {
         user: {
           id: user.id,
@@ -16,6 +16,28 @@ export class LabelsService {
       },
       include: {
         label: true,
+      },
+    });
+  }
+
+  async getLabels() {
+    return this.prisma.label.findMany();
+  }
+
+  async getAllTracksForLabel(labelId: number) {
+    return this.prisma.track.findMany({
+      where: {
+        label: {
+          id: labelId,
+        },
+      },
+    });
+  }
+
+  async getLabelById(labelId: number) {
+    return this.prisma.label.findUnique({
+      where: {
+        id: labelId,
       },
     });
   }
