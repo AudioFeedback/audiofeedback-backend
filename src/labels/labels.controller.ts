@@ -30,7 +30,7 @@ export class LabelsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.FEEDBACKGEVER, Role.ADMIN, Role.MUZIEKPRODUCER)
-  async getLabels(@Req() req: Request) {
+  async getLabels() {
     const labels = await this.labelsService.getLabels();
 
     return labels.map((x) => new GetLabelDto(x));
