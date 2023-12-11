@@ -41,4 +41,28 @@ export class LabelsService {
       },
     });
   }
+
+  async getAvailableReviewers() {
+    return this.prisma.user.findMany({
+      where: {
+        roles: {
+          has: "FEEDBACKGEVER",
+        },
+        NOT: {
+          LabelMember: {
+            some: {
+              OR: [
+                {
+                  status: "ACCEPTED",
+                },
+                {
+                  status: "INVITED",
+                },
+              ],
+            },
+          },
+        },
+      },
+    });
+  }
 }

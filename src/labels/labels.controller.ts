@@ -9,6 +9,7 @@ import { GetTrackDto } from "../tracks/dto/get-track.dto";
 import { GetLabelDto } from "./dto/get-label.dto";
 import { GetLabelMemberWithLabelDto } from "./dto/get-labelmember-with-label.dto";
 import { LabelsService } from "./labels.service";
+import { GetUserDto } from "src/users/dto/get-user.dto";
 
 @ApiTags("labels")
 @Controller("labels")
@@ -51,5 +52,11 @@ export class LabelsController {
     const labels = await this.labelsService.getAllTracksForLabel(+labelId);
 
     return labels.map((x) => new GetTrackDto(x));
+  }
+
+  @Get("reviewers")
+  async getAvailableReviewers() {
+    const reviewers = await this.labelsService.getAvailableReviewers();
+    return reviewers.map((x) => new GetUserDto(x));
   }
 }
