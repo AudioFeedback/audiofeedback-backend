@@ -23,12 +23,35 @@ async function main() {
   const musicProducer1 = await createRandomUser([Role.MUZIEKPRODUCER], "muziekproducer");
 
   const PerfectNight = await addTrackToMusicProducer(musicProducer1, PefectNight, [feedbackgever1, feedbackgever3]);
+
+  await addTrackToLabel(PerfectNight[0], LabelSwingTijger)
+  await addTrackToLabel(PerfectNight[0], LabelBananenBeat)
+  await addTrackToLabel(PerfectNight[0], LabelLachendeNoten)
+  await addTrackToLabel(PerfectNight[0], LabelFunkFusie)
+
   const WatrByYourSideTrack = await addTrackToMusicProducer(musicProducer1, WatrByYourSide, [feedbackgever1, feedbackgever2, feedbackgever3]);
+
+  await addTrackToLabel(WatrByYourSideTrack[0], LabelSwingTijger)
+  await addTrackToLabel(WatrByYourSideTrack[0], LabelBananenBeat)
+  await addTrackToLabel(WatrByYourSideTrack[0], LabelLachendeNoten)
+  await addTrackToLabel(WatrByYourSideTrack[0], LabelFunkFusie)
+
   const FuturisticBeatTrack = await addTrackToMusicProducer(musicProducer1, FuturisticBeat, [feedbackgever1, feedbackgever2, feedbackgever3]);
+
+  await addTrackToLabel(FuturisticBeatTrack[0], LabelSwingTijger)
+  await addTrackToLabel(FuturisticBeatTrack[0], LabelBananenBeat)
+  await addTrackToLabel(FuturisticBeatTrack[0], LabelLachendeNoten)
+  await addTrackToLabel(FuturisticBeatTrack[0], LabelFunkFusie)
 
   const musicroducer2 = await createRandomUser([Role.MUZIEKPRODUCER]);
 
   const EmbraceTrack = await addTrackToMusicProducer(musicroducer2, Embrace, [feedbackgever1, feedbackgever2, feedbackgever3]);
+
+  await addTrackToLabel(EmbraceTrack[0], LabelSwingTijger)
+  await addTrackToLabel(EmbraceTrack[0], LabelBananenBeat)
+  await addTrackToLabel(EmbraceTrack[0], LabelLachendeNoten)
+  await addTrackToLabel(EmbraceTrack[0], LabelFunkFusie)
+
   const ModernVlogTrack = await addTrackToMusicProducer(musicroducer2, ModernVlog, [feedbackgever3]);
 
   await addUserToLabel(InviteStatus.ACCEPTED, superUser, LabelSwingTijger)
@@ -191,6 +214,29 @@ function createLabel(label: LabelData) {
   return prisma.label.create({
     data: {
       ...label
+    }
+  })
+}
+
+async function addTrackToLabel(trackVersion: TrackVersion, label: Label) {
+  const track = await prisma.track.findFirst({
+    where: {
+      trackVersions: {
+        some: {
+          id: trackVersion.id,
+        }
+      }
+    }
+  })
+
+  return prisma.track.update({
+    where: {
+      id: track.id
+    },
+    data: {
+      labels: {
+        connect: {id: label.id}
+      }
     }
   })
 }

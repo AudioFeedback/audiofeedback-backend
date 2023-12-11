@@ -19,6 +19,7 @@ model Track {
   authorId      Int
   trackVersions TrackVersion[]
   reviewers     User[]         @relation("reviewer")
+  labels        Label[]
   author        User           @relation(fields: [authorId], references: [id])
 }
 
@@ -83,6 +84,7 @@ model Label {
   genre          String
   profilePicture String?
   LabelMember    LabelMember[]
+  Tracks         Track[]
 }
 
 enum Role {
