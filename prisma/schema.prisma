@@ -36,7 +36,7 @@ model TrackVersion {
   filetype      String
   duration      Int
   feedback      Feedback[]
-  track         Track      @relation(fields: [trackId], references: [id])
+  track         Track      @relation(fields: [trackId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -65,7 +65,7 @@ model Feedback {
   userId         Int
   trackVersionId Int
   user           User         @relation(fields: [userId], references: [id])
-  trackVersion   TrackVersion @relation(fields: [trackVersionId], references: [id])
+  trackVersion   TrackVersion @relation(fields: [trackVersionId], references: [id], onDelete: Cascade)
 }
 
 model LabelMember {

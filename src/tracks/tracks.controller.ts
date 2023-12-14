@@ -13,7 +13,9 @@ import {
   HttpException,
   HttpStatus,
   Patch,
+  Delete,
 } from "@nestjs/common";
+import { GetTrackDto } from "./dto/get-track.dto";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
@@ -36,6 +38,7 @@ import { GetReviewTrackDto } from "./dto/get-review-track.dto";
 import { UsersService } from "src/users/users.service";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -84,20 +87,19 @@ export class TracksController {
       );
     }
 
-    const track = await this.tracksService.create(
-      createTrackDto,
-      <User>req.user,
-    );
-
     const fileData = await this.tracksService.saveFile(file);
 
     if (!fileData) {
-      // Todo: delete the created track
       throw new HttpException(
         "Error in het opslaan van het bestand.",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    const track = await this.tracksService.create(
+      createTrackDto,
+      <User>req.user,
+    );
 
     const trackVersionData: TrackVersionData = {
       id: track.id,
@@ -255,8 +257,30 @@ export class TracksController {
     return true;
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.tracksService.remove(+id);
-  // }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Patch(":trackversionId/publish")
+  async publishFeedback(@Param("trackversionId") id: string) {
+    await this.tracksService.publishReview(+id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
+  @Patch(":id/update")
+  async update(
+    @Param("id") id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    return await this.tracksService.updateTrack(+id, updateTrackDto);
+  }
+
+  @Roles(Role.MUZIEKPRODUCER)
+  @Delete(":id")
+  async remove(@Param("id") id: string) {
+    const res = await this.tracksService.deleteTrack(+id);
+
+    return new GetTrackDto(res);
+  }
 }
