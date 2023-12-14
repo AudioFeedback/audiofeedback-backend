@@ -12,7 +12,6 @@ export class LabelsService {
         user: {
           id: user.id,
         },
-        status: InviteStatus.INVITED,
       },
       include: {
         label: true,
