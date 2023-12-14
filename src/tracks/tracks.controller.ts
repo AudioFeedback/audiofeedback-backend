@@ -36,6 +36,7 @@ import { GetReviewTrackDto } from "./dto/get-review-track.dto";
 import { UsersService } from "src/users/users.service";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -263,6 +264,20 @@ export class TracksController {
     @Param("trackversionId") id: string,
   ) {
     await this.tracksService.publishReview(+id)
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
+  @Patch(":id/update")
+  async update(
+    @Param("id") id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    return await this.tracksService.updateTrack(
+      +id,
+      updateTrackDto,
+    );
   }
 
   // @Delete(':id')
