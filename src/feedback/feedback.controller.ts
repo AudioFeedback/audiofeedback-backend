@@ -117,13 +117,12 @@ export class FeedbackController {
   @Roles(Role.ADMIN, Role.FEEDBACKGEVER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  remove(@Param("id") id: number,@Req() req: Request,) {
-    const user = <User>req.user
+  remove(@Param("id") id: number, @Req() req: Request) {
+    const user = <User>req.user;
 
     if (user.roles.includes(Role.ADMIN)) {
       return this.feedbackService.remove(+id);
-    }
-    else if (user.roles.includes(Role.FEEDBACKGEVER)) {
+    } else if (user.roles.includes(Role.FEEDBACKGEVER)) {
       return this.feedbackService.removeAsFeedbackgever(+id);
     }
   }

@@ -87,7 +87,7 @@ export class FeedbackService {
         id,
         NOT: {
           isPublished: true,
-        }
+        },
       },
     });
 
@@ -99,13 +99,12 @@ export class FeedbackService {
     });
 
     if (feedback) {
-      throw new NotFoundException("Feedback with ID ${id} already published")
+      throw new NotFoundException("Feedback with ID ${id} already published");
     }
-    
+
     if (!existingFeedback) {
       throw new NotFoundException("Feedback with ID ${id} not found");
     }
-
 
     return this.prisma.feedback.delete({ where: { id } });
   }
