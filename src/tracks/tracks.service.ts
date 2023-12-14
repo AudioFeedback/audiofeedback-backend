@@ -4,7 +4,7 @@ import { createWriteStream, readFileSync, rmSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
-import { InviteStatus, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import * as mm from "music-metadata";
 import { UpdateTrackDto } from "./dto/update-track.dto";
 // import { UpdateTrackDto } from "./dto/update-track.dto";
@@ -332,11 +332,11 @@ export class TracksService {
     });
   }
 
-  async updateTrack(id: number, updateTrackDto: UpdateTrackDto) {    
+  async updateTrack(id: number, updateTrackDto: UpdateTrackDto) {
     const existingTrack = await this.prisma.track.findUnique({
-      where: { 
+      where: {
         id: id,
-       },
+      },
     });
 
     if (!existingTrack) {

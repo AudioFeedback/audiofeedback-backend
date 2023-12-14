@@ -71,7 +71,7 @@ export class LabelsService {
       where: {
         name: {
           startsWith: query,
-          mode: "insensitive"
+          mode: "insensitive",
         },
       },
     });

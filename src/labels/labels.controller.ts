@@ -60,7 +60,6 @@ export class LabelsController {
     return reviewers.map((x) => new GetUserDto(x));
   }
 
-
   @Get("typeahead/:query")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()

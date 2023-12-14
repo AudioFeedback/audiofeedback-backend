@@ -273,10 +273,7 @@ export class TracksController {
     @Param("id") id: string,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
-    return await this.tracksService.updateTrack(
-      +id,
-      updateTrackDto,
-    );
+    return await this.tracksService.updateTrack(+id, updateTrackDto);
   }
 
   @Roles(Role.MUZIEKPRODUCER)
