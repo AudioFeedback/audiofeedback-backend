@@ -26,6 +26,15 @@ export class UsersService {
     });
   }
 
+  async findOneDeep(userWhereInput: Prisma.UserWhereInput) {
+    return this.prisma.user.findFirst({
+      where: userWhereInput,
+      include: {
+        labelMember: true,
+      },
+    });
+  }
+
   async getNotifications(user: User) {
     const invites = await this.prisma.labelMember.findMany({
       where: {

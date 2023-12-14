@@ -51,7 +51,7 @@ model User {
   tracks      Track[]
   feedback    Feedback[]
   reviewable  Track[]       @relation("reviewer")
-  LabelMember LabelMember[]
+  labelMember LabelMember[]
 }
 
 model Feedback {
@@ -84,8 +84,8 @@ model Label {
   description    String
   genre          String
   profilePicture String?
-  LabelMember    LabelMember[]
-  Tracks         Track[]
+  labelMember    LabelMember[]
+  tracks         Track[]
 }
 
 enum Role {

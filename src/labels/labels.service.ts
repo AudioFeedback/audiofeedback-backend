@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { InviteStatus, User } from "@prisma/client";
+import { InviteStatus, Label, User } from "@prisma/client";
 import { PrismaService } from "src/prisma.service";
 
 @Injectable()
@@ -42,21 +42,23 @@ export class LabelsService {
     });
   }
 
-  async getAvailableReviewers() {
+  async getAvailableReviewers(labelId: number) {
     return this.prisma.user.findMany({
       where: {
         roles: {
           has: "FEEDBACKGEVER",
         },
-        NOT: {
-          LabelMember: {
-            some: {
+        labelMember: {
+          every: {
+            NOT: {
               OR: [
                 {
-                  status: "ACCEPTED",
+                  labelId: labelId,
+                  status: InviteStatus.ACCEPTED,
                 },
                 {
-                  status: "INVITED",
+                  labelId: labelId,
+                  status: InviteStatus.INVITED,
                 },
               ],
             },
@@ -71,8 +73,29 @@ export class LabelsService {
       where: {
         name: {
           startsWith: query,
-          mode: "insensitive"
+          mode: "insensitive",
         },
+      },
+    });
+  }
+
+  async invite(user: User, label: Label) {
+    return this.prisma.labelMember.create({
+      data: {
+        status: InviteStatus.INVITED,
+        userId: user.id,
+        labelId: label.id,
+      },
+    });
+  }
+
+  async setInviteStatus(labelMemberId: number, status: InviteStatus) {
+    return this.prisma.labelMember.update({
+      data: {
+        status: status,
+      },
+      where: {
+        id: labelMemberId,
       },
     });
   }
