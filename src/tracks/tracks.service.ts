@@ -248,6 +248,12 @@ export class TracksService {
         trackVersions: {
           include: {
             feedback: {
+              where: {
+                isPublished: true,
+                trackVersion: {
+                  isReviewed: true,
+                },
+              },
               orderBy: {
                 timestamp: "asc",
               },
@@ -333,5 +339,14 @@ export class TracksService {
     const rootDir = process.cwd();
     const mp3FilePath = path.join(rootDir, "audio", filename);
     return readFileSync(mp3FilePath, null);
+  }
+
+  async publishReview(trackversionId: number) {
+    return this.prisma.trackVersion.update({
+      where: { id: trackversionId },
+      data: {
+        isReviewed: true,
+      },
+    });
   }
 }

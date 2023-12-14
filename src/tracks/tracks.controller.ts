@@ -255,6 +255,16 @@ export class TracksController {
     return true;
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Patch(":trackversionId/publish")
+  async publishFeedback(
+    @Param("trackversionId") id: string,
+  ) {
+    await this.tracksService.publishReview(+id)
+  }
+
   // @Delete(':id')
   // remove(@Param('id') id: string) {
   //   return this.tracksService.remove(+id);
