@@ -13,7 +13,9 @@ import {
   HttpException,
   HttpStatus,
   Patch,
+  Delete,
 } from "@nestjs/common";
+import { GetTrackDto } from "./dto/get-track.dto";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
@@ -84,20 +86,19 @@ export class TracksController {
       );
     }
 
-    const track = await this.tracksService.create(
-      createTrackDto,
-      <User>req.user,
-    );
-
     const fileData = await this.tracksService.saveFile(file);
 
     if (!fileData) {
-      // Todo: delete the created track
       throw new HttpException(
         "Error in het opslaan van het bestand.",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    const track = await this.tracksService.create(
+      createTrackDto,
+      <User>req.user,
+    );
 
     const trackVersionData: TrackVersionData = {
       id: track.id,
@@ -259,14 +260,17 @@ export class TracksController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Patch(":trackversionId/publish")
-  async publishFeedback(
-    @Param("trackversionId") id: string,
-  ) {
-    await this.tracksService.publishReview(+id)
+  async publishFeedback(@Param("trackversionId") id: string) {
+    await this.tracksService.publishReview(+id);
   }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.tracksService.remove(+id);
-  // }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  @Delete(":id")
+  async remove(@Param("id") id: string) {
+    const res = await this.tracksService.deleteTrack(+id);
+
+    return new GetTrackDto(res);
+  }
 }

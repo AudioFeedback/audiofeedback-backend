@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { createWriteStream, readFileSync } from "fs";
+import { createWriteStream, readFileSync, rmSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
@@ -331,10 +331,6 @@ export class TracksService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
-  }
-
   async getAudioFile(filename: string) {
     const rootDir = process.cwd();
     const mp3FilePath = path.join(rootDir, "audio", filename);
@@ -348,5 +344,42 @@ export class TracksService {
         isReviewed: true,
       },
     });
+  }
+
+  async deleteTrack(id: number) {
+    const track = await this.prisma.track.findUnique({
+      where: { id: id },
+      include: {
+        trackVersions: {
+          include: {
+            feedback: true,
+          },
+        },
+      },
+    });
+
+    if (!track) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+
+    const trackVersions = track.trackVersions;
+
+    trackVersions.forEach((trackVersion) => {
+      this.deleteFile(`${trackVersion.guid}.${trackVersion.filetype}`);
+    });
+
+    return this.prisma.track.delete({
+      where: { id: id },
+    });
+  }
+
+  async deleteFile(fileName: string) {
+    try {
+      const rootDir = process.cwd();
+      const mp3FilePath = path.join(rootDir, "audio", fileName);
+      rmSync(mp3FilePath);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
