@@ -206,9 +206,9 @@ export class TracksController {
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER)
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
   async findOne(@Param("id") id: number, @Req() req: Request) {
-    const track = await this.tracksService.findOneDeep(+id);
+    const track = await this.tracksService.findOneDeep(+id, <User>req.user);
 
     if (!track) {
       throw new HttpException(
