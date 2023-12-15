@@ -67,6 +67,28 @@ export class LabelsService {
     });
   }
 
+  async getAssignedReviewers(labelId: number) {
+    return this.prisma.user.findMany({
+      include: {
+        labelMember: {
+          where: {
+            labelId: labelId,
+          },
+        },
+      },
+      where: {
+        roles: {
+          has: "FEEDBACKGEVER",
+        },
+        labelMember: {
+          some: {
+            labelId: labelId,
+          },
+        },
+      },
+    });
+  }
+
   async getLabelTypeahead(query: string) {
     return this.prisma.label.findMany({
       where: {

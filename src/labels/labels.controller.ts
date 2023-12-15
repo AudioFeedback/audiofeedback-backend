@@ -24,6 +24,7 @@ import { GetUserDto } from "src/users/dto/get-user.dto";
 import { InviteUserDto } from "./dto/invite-user.dto";
 import { UsersService } from "src/users/users.service";
 import { UpdateLabelMemberStatusDto } from "./dto/update-labelmember-status.dto";
+import { GetUserWithLabelMemberDto } from "src/users/dto/get-user-with-labelmember.dto";
 
 @ApiTags("labels")
 @Controller("labels")
@@ -232,6 +233,12 @@ export class LabelsController {
   async getAvailableReviewers(@Param("id") labelId: number) {
     const reviewers = await this.labelsService.getAvailableReviewers(+labelId);
     return reviewers.map((x) => new GetUserDto(x));
+  }
+
+  @Get(":id/assigned-reviewers")
+  async getAssignedReviewers(@Param("id") labelId: number) {
+    const reviewers = await this.labelsService.getAssignedReviewers(+labelId);
+    return reviewers.map((x) => new GetUserWithLabelMemberDto(x));
   }
 
   @Get("typeahead/:query")
