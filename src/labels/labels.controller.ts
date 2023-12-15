@@ -5,7 +5,7 @@ import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
-import { GetTrackDto } from "../tracks/dto/get-track.dto";
+import { GetTrackWithReviewersDto } from "../tracks/dto/get-track-with-reviewers.dto";
 import { GetLabelDto } from "./dto/get-label.dto";
 import { GetLabelMemberWithLabelDto } from "./dto/get-labelmember-with-label.dto";
 import { LabelsService } from "./labels.service";
@@ -48,10 +48,10 @@ export class LabelsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  async getAllTracksForLabel(@Param("id") labelId: number) {
+  async getAllTracksForLabel(@Param("id") labelId: number, @Req() req: Request) {
     const labels = await this.labelsService.getAllTracksForLabel(+labelId);
 
-    return labels.map((x) => new GetTrackDto(x));
+    return labels.map((x) => new GetTrackWithReviewersDto(x, <User>req.user, req));
   }
 
   @Get("reviewers")
