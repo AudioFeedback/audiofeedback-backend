@@ -38,6 +38,7 @@ import { GetReviewTrackDto } from "./dto/get-review-track.dto";
 import { UsersService } from "src/users/users.service";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -205,9 +206,9 @@ export class TracksController {
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER)
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
   async findOne(@Param("id") id: number, @Req() req: Request) {
-    const track = await this.tracksService.findOneDeep(+id);
+    const track = await this.tracksService.findOneDeep(+id, <User>req.user);
 
     if (!track) {
       throw new HttpException(
@@ -266,6 +267,15 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
+  @Patch(":id/update")
+  async update(
+    @Param("id") id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    return await this.tracksService.updateTrack(+id, updateTrackDto);
+  }
+
   @Roles(Role.MUZIEKPRODUCER)
   @Delete(":id")
   async remove(@Param("id") id: string) {
