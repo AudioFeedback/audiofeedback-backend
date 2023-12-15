@@ -58,7 +58,7 @@ export class LabelsController {
 
     if (
       !(
-        admin.labelMember.find((x) => x.labelId == labelId).status ===
+        admin.labelMember.find((x) => x.labelId == labelId)?.status ===
         InviteStatus.ACCEPTED
       )
     ) {
@@ -92,11 +92,26 @@ export class LabelsController {
       );
     }
 
-    if (user.labelMember.map((x) => x.labelId).includes(labelId)) {
-      throw new HttpException(`User already invited.`, HttpStatus.BAD_REQUEST);
-    }
+    const labelMember = user.labelMember.find((x) => x.labelId === +labelId);
 
-    return await this.labelsService.invite(user, label);
+    if (!labelMember) {
+      return await this.labelsService.invite(user, label);
+    } else if (labelMember.status === InviteStatus.INVITED) {
+      throw new HttpException(
+        `User is already invited.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if (labelMember.status === InviteStatus.ACCEPTED) {
+      throw new HttpException(
+        `User is already in label.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      return await this.labelsService.setInviteStatus(
+        +labelMember.id,
+        InviteStatus.INVITED,
+      );
+    }
   }
 
   @Patch(":id/accept")
@@ -223,10 +238,15 @@ export class LabelsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  async getAllTracksForLabel(@Param("id") labelId: number, @Req() req: Request) {
+  async getAllTracksForLabel(
+    @Param("id") labelId: number,
+    @Req() req: Request,
+  ) {
     const labels = await this.labelsService.getAllTracksForLabel(+labelId);
 
-    return labels.map((x) => new GetTrackWithReviewersDto(x, <User>req.user, req));
+    return labels.map(
+      (x) => new GetTrackWithReviewersDto(x, <User>req.user, req),
+    );
   }
 
   @Get(":id/reviewers")

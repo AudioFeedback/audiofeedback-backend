@@ -19,6 +19,7 @@ export class GetUserWithLabelMemberDto {
   constructor(user: UserWithLabelMember) {
     this.id = user.id;
     this.firstname = user.firstname;
+    this.lastname = user.lastname;
     this.roles = user.roles;
     this.labelMember = user.labelMember.map((x) => new GetLabelMemberDto(x));
   }
