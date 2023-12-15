@@ -12,7 +12,6 @@ export class LabelsService {
         user: {
           id: user.id,
         },
-        status: InviteStatus.INVITED,
       },
       include: {
         label: true,
@@ -29,6 +28,32 @@ export class LabelsService {
       where: {
         label: {
           id: labelId,
+        },
+      },
+      include: {
+        author: true,
+        reviewers: {
+          include: {
+            feedback: {
+              where: {
+                isPublished: true,
+                trackVersion: {
+                  track: {
+                    labelId: labelId,
+                  },
+                },
+              },
+            },
+          },
+        },
+        trackVersions: {
+          include: {
+            feedback: {
+              where: {
+                isPublished: true,
+              },
+            },
+          },
         },
       },
     });
@@ -62,6 +87,28 @@ export class LabelsService {
                 },
               ],
             },
+          },
+        },
+      },
+    });
+  }
+
+  async getAssignedReviewers(labelId: number) {
+    return this.prisma.user.findMany({
+      include: {
+        labelMember: {
+          where: {
+            labelId: labelId,
+          },
+        },
+      },
+      where: {
+        roles: {
+          has: "FEEDBACKGEVER",
+        },
+        labelMember: {
+          some: {
+            labelId: labelId,
           },
         },
       },

@@ -16,7 +16,7 @@ import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
-import { GetTrackDto } from "../tracks/dto/get-track.dto";
+import { GetTrackWithReviewersDto } from "../tracks/dto/get-track-with-reviewers.dto";
 import { GetLabelDto } from "./dto/get-label.dto";
 import { GetLabelMemberWithLabelDto } from "./dto/get-labelmember-with-label.dto";
 import { LabelsService } from "./labels.service";
@@ -24,6 +24,7 @@ import { GetUserDto } from "src/users/dto/get-user.dto";
 import { InviteUserDto } from "./dto/invite-user.dto";
 import { UsersService } from "src/users/users.service";
 import { UpdateLabelMemberStatusDto } from "./dto/update-labelmember-status.dto";
+import { GetUserWithLabelMemberDto } from "src/users/dto/get-user-with-labelmember.dto";
 
 @ApiTags("labels")
 @Controller("labels")
@@ -57,7 +58,7 @@ export class LabelsController {
 
     if (
       !(
-        admin.labelMember.find((x) => x.labelId == labelId).status ===
+        admin.labelMember.find((x) => x.labelId == labelId)?.status ===
         InviteStatus.ACCEPTED
       )
     ) {
@@ -91,11 +92,26 @@ export class LabelsController {
       );
     }
 
-    if (user.labelMember.map((x) => x.labelId).includes(labelId)) {
-      throw new HttpException(`User already invited.`, HttpStatus.BAD_REQUEST);
-    }
+    const labelMember = user.labelMember.find((x) => x.labelId === +labelId);
 
-    return await this.labelsService.invite(user, label);
+    if (!labelMember) {
+      return await this.labelsService.invite(user, label);
+    } else if (labelMember.status === InviteStatus.INVITED) {
+      throw new HttpException(
+        `User is already invited.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if (labelMember.status === InviteStatus.ACCEPTED) {
+      throw new HttpException(
+        `User is already in label.`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      return await this.labelsService.setInviteStatus(
+        +labelMember.id,
+        InviteStatus.INVITED,
+      );
+    }
   }
 
   @Patch(":id/accept")
@@ -222,16 +238,27 @@ export class LabelsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
-  async getAllTracksForLabel(@Param("id") labelId: number) {
+  async getAllTracksForLabel(
+    @Param("id") labelId: number,
+    @Req() req: Request,
+  ) {
     const labels = await this.labelsService.getAllTracksForLabel(+labelId);
 
-    return labels.map((x) => new GetTrackDto(x));
+    return labels.map(
+      (x) => new GetTrackWithReviewersDto(x, <User>req.user, req),
+    );
   }
 
   @Get(":id/reviewers")
   async getAvailableReviewers(@Param("id") labelId: number) {
     const reviewers = await this.labelsService.getAvailableReviewers(+labelId);
     return reviewers.map((x) => new GetUserDto(x));
+  }
+
+  @Get(":id/assigned-reviewers")
+  async getAssignedReviewers(@Param("id") labelId: number) {
+    const reviewers = await this.labelsService.getAssignedReviewers(+labelId);
+    return reviewers.map((x) => new GetUserWithLabelMemberDto(x));
   }
 
   @Get("typeahead/:query")

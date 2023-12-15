@@ -1,6 +1,6 @@
 import { Role, User } from "@prisma/client";
 
-export class GetUserWithNotifications {
+export class GetUserWithNotificationsDto {
   id: number;
   username: string;
   firstname: string;
