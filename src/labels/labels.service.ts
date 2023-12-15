@@ -30,6 +30,32 @@ export class LabelsService {
           id: labelId,
         },
       },
+      include: {
+        author: true,
+        reviewers: {
+          include: {
+            feedback: {
+              where: {
+                isPublished: true,
+                trackVersion: {
+                  track: {
+                    labelId: labelId,
+                  },
+                },
+              },
+            },
+          },
+        },
+        trackVersions: {
+          include: {
+            feedback: {
+              where: {
+                isPublished: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
