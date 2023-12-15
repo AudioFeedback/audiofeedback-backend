@@ -6,7 +6,7 @@ import { JwtAuthGuard } from "./auth/jwt-auth.guard";
 import { UsersService } from "./users/users.service";
 import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
-import { GetUserWithNotifications } from "./users/dto/get-user-with-notifications";
+import { GetUserWithNotificationsDto } from "./users/dto/get-user-with-notifications.dto";
 
 @Controller()
 export class AppController {
@@ -46,6 +46,6 @@ export class AppController {
 
     const notifications = await this.userService.getNotifications(user);
 
-    return new GetUserWithNotifications(user, notifications);
+    return new GetUserWithNotificationsDto(user, notifications);
   }
 }
