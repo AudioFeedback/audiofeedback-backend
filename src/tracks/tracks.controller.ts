@@ -262,7 +262,7 @@ export class TracksController {
   @Roles(Role.ADMIN)
   @Patch(":trackversionId/publish")
   async publishFeedback(@Param("trackversionId") id: string) {
-    await this.tracksService.publishReview(+id);
+    return await this.tracksService.publishReview(+id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
