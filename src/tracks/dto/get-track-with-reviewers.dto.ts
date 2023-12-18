@@ -1,18 +1,32 @@
 import { Prisma, User } from "@prisma/client";
 import { GetUserDto } from "src/users/dto/get-user.dto";
+import { Request } from "express";
+import { GetReviewerDto } from "../../users/dto/get-reviewer.dto";
+import { GetTrackVersionDto } from "./get-trackversion.dto";
 
-const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
+const trackWithReviewers = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: {
     author: true,
-    trackVersions: {
+    reviewers: {
       include: {
         feedback: true,
+      },
+    },
+    trackVersions: {
+      include: {
+        feedback: {
+          where: {
+            isPublished: true,
+          },
+        },
       },
     },
   },
 });
 
-export type TrackWithAuthor = Prisma.TrackGetPayload<typeof trackWithAuthor>;
+export type TrackWithReviewers = Prisma.TrackGetPayload<
+  typeof trackWithReviewers
+>;
 
 export enum TrackStatus {
   PENDING_REVIEW = "PENDING_REVIEW",
@@ -23,22 +37,30 @@ export enum TrackStatus {
   SEND = "SEND",
 }
 
-export class GetTrackWithAuthorDto {
+export class GetTrackWithReviewersDto {
   id: number;
   title: string;
   genre: string;
   author: GetUserDto;
+  reviewers: GetReviewerDto[];
   status: TrackStatus[];
+  trackversions: GetTrackVersionDto[];
 
-  constructor(track: TrackWithAuthor, user: User) {
+  constructor(track: TrackWithReviewers, user: User, req: Request) {
     this.id = track.id;
     this.title = track.title;
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
+    this.reviewers = track.reviewers.map(
+      (x) => new GetReviewerDto(x, track.trackVersions[0]),
+    );
     this.status = this.getStatus(track, user);
+    this.trackversions = track.trackVersions.map(
+      (x) => new GetTrackVersionDto(x, req),
+    );
   }
 
-  getStatus(track: TrackWithAuthor, user: User): TrackStatus[] {
+  getStatus(track: TrackWithReviewers, user: User): TrackStatus[] {
     const trackStatus = [];
     const trackversion = track.trackVersions[0];
 

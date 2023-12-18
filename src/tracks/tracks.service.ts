@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { createWriteStream, readFileSync } from "fs";
+import { createWriteStream, readFileSync, rmSync } from "fs";
 import * as path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import * as mm from "music-metadata";
+import { UpdateTrackDto } from "./dto/update-track.dto";
+// import { UpdateTrackDto } from "./dto/update-track.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 
 @Injectable()
 export class TracksService {
@@ -48,10 +51,16 @@ export class TracksService {
       createTrackDto.reviewerIds,
     );
 
+    const labelId = createTrackDto.labelId;
+
     if (reviewerIds.length > 0) {
       this.throwErrorIfInvalidUsers(reviewerIds);
 
       return this.createWithReviewers(createTrackDto, user, reviewerIds);
+    }
+
+    if (labelId) {
+      return this.createWithLabel(createTrackDto, user, labelId);
     }
 
     return this.createWithoutReviewer(createTrackDto, user);
@@ -90,7 +99,7 @@ export class TracksService {
     user: User,
     reviewerIds: number[],
   ) {
-    return await this.prisma.track.create({
+    return this.prisma.track.create({
       data: {
         title: createTrackDto.title,
         genre: createTrackDto.genre,
@@ -108,6 +117,7 @@ export class TracksService {
       include: {
         author: true,
         reviewers: true,
+        label: true,
       },
     });
   }
@@ -116,7 +126,7 @@ export class TracksService {
     createTrackDto: CreateTrackDto,
     user: User,
   ) {
-    return await this.prisma.track.create({
+    return this.prisma.track.create({
       data: {
         title: createTrackDto.title,
         genre: createTrackDto.genre,
@@ -127,6 +137,31 @@ export class TracksService {
       include: {
         author: true,
         reviewers: true,
+        label: true,
+      },
+    });
+  }
+
+  private async createWithLabel(
+    createTrackDto: CreateTrackDto,
+    user: User,
+    labelId: number,
+  ) {
+    return this.prisma.track.create({
+      data: {
+        title: createTrackDto.title,
+        genre: createTrackDto.genre,
+        author: {
+          connect: { id: Number(user.id) },
+        },
+        label: {
+          connect: { id: Number(labelId) },
+        },
+      },
+      include: {
+        author: true,
+        reviewers: true,
+        label: true,
       },
     });
   }
@@ -136,6 +171,18 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          trackVersions: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              feedback: {
+                where: {
+                  isPublished: true,
+                },
+              },
+            },
+          },
         },
         where: {
           OR: [{ authorId: user.id }],
@@ -147,6 +194,20 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          trackVersions: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              feedback: {
+                where: {
+                  user: {
+                    id: user.id,
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           reviewers: {
@@ -165,31 +226,72 @@ export class TracksService {
     });
   }
 
-  findOneTrackVersion(id: number) {
+  findOneTrackVersion(user: User, id: number) {
     return this.prisma.trackVersion.findUnique({
-      where: { id: id },
-    });
-  }
-
-  findOneDeep(id: number) {
-    return this.prisma.track.findUnique({
-      where: { id: id },
-      include: {
-        reviewers: true,
-        trackVersions: {
-          include: {
-            feedback: {
-              orderBy: {
-                timestamp: "asc",
-              },
-              include: {
-                user: true,
-              },
+      where: {
+        id: id,
+        track: {
+          reviewers: {
+            some: {
+              id: user.id,
             },
           },
         },
       },
     });
+  }
+
+  findOneDeep(id: number, user: User) {
+    if (user.roles.includes(Role.MUZIEKPRODUCER)) {
+      return this.prisma.track.findUnique({
+        where: { id: id },
+        include: {
+          reviewers: true,
+          trackVersions: {
+            include: {
+              feedback: {
+                where: {
+                  isPublished: true,
+                  trackVersion: {
+                    isReviewed: true,
+                  },
+                },
+                orderBy: {
+                  timestamp: "asc",
+                },
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    } else {
+      if (user.roles.includes(Role.ADMIN)) {
+        return this.prisma.track.findUnique({
+          where: { id: id },
+          include: {
+            reviewers: true,
+            trackVersions: {
+              include: {
+                feedback: {
+                  where: {
+                    isPublished: true,
+                  },
+                  orderBy: {
+                    timestamp: "asc",
+                  },
+                  include: {
+                    user: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
   }
 
   findOneDeepReviewer(id: number, reviewer: User) {
@@ -229,8 +331,49 @@ export class TracksService {
     });
   }
 
-  update(id: number) {
-    return `This action updates a #${id} track`;
+  async updateReviewers(
+    id: number,
+    updateTrackReviewersDto: UpdateTrackReviewersDto,
+  ) {
+    const existingTrack = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existingTrack) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    return await this.prisma.track.update({
+      where: { id },
+      data: {
+        reviewers: {
+          connect: updateTrackReviewersDto.reviewerIds
+            .map((x) => x)
+            .map((id) => {
+              return { id: id };
+            }),
+        },
+      },
+    });
+  }
+
+  async updateTrack(id: number, updateTrackDto: UpdateTrackDto) {
+    const existingTrack = await this.prisma.track.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existingTrack) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+
+    const updatedTrack = await this.prisma.track.update({
+      where: { id },
+      data: updateTrackDto,
+    });
+    return updatedTrack;
   }
 
   remove(id: number) {
@@ -241,5 +384,51 @@ export class TracksService {
     const rootDir = process.cwd();
     const mp3FilePath = path.join(rootDir, "audio", filename);
     return readFileSync(mp3FilePath, null);
+  }
+
+  async publishReview(trackversionId: number) {
+    return this.prisma.trackVersion.update({
+      where: { id: trackversionId },
+      data: {
+        isReviewed: true,
+      },
+    });
+  }
+
+  async deleteTrack(id: number) {
+    const track = await this.prisma.track.findUnique({
+      where: { id: id },
+      include: {
+        trackVersions: {
+          include: {
+            feedback: true,
+          },
+        },
+      },
+    });
+
+    if (!track) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+
+    const trackVersions = track.trackVersions;
+
+    trackVersions.forEach((trackVersion) => {
+      this.deleteFile(`${trackVersion.guid}.${trackVersion.filetype}`);
+    });
+
+    return this.prisma.track.delete({
+      where: { id: id },
+    });
+  }
+
+  async deleteFile(fileName: string) {
+    try {
+      const rootDir = process.cwd();
+      const mp3FilePath = path.join(rootDir, "audio", fileName);
+      rmSync(mp3FilePath);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

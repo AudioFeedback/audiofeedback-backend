@@ -19,13 +19,16 @@ model Track {
   authorId      Int
   trackVersions TrackVersion[]
   reviewers     User[]         @relation("reviewer")
+  label         Label?         @relation(fields: [labelId], references: [id])
   author        User           @relation(fields: [authorId], references: [id])
+  labelId       Int?
 }
 
 model TrackVersion {
   id            Int        @id @default(autoincrement())
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+  isReviewed    Boolean    @default(false)
   trackId       Int
   versionNumber Int
   description   String
@@ -33,39 +36,66 @@ model TrackVersion {
   filetype      String
   duration      Int
   feedback      Feedback[]
-  track         Track      @relation(fields: [trackId], references: [id])
+  track         Track      @relation(fields: [trackId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  username   String     @unique
-  firstname  String
-  lastname   String
-  password   String
-  roles      Role[]
-  tracks     Track[]
-  feedback   Feedback[]
-  reviewable Track[]    @relation("reviewer")
+  id          Int           @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  username    String        @unique
+  firstname   String
+  lastname    String
+  password    String
+  roles       Role[]
+  tracks      Track[]
+  feedback    Feedback[]
+  reviewable  Track[]       @relation("reviewer")
+  labelMember LabelMember[]
 }
 
 model Feedback {
-  id          Int          @id @default(autoincrement())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  isPublished Boolean      @default(false)
-  timestamp   Float
-  rating      Boolean
-  comment     String
-  userId      Int
-  trackVersionId     Int
-  user        User         @relation(fields: [userId], references: [id])
-  trackVersion       TrackVersion @relation(fields: [trackVersionId], references: [id])
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  isPublished    Boolean      @default(false)
+  timestamp      Float?
+  rating         Boolean
+  comment        String
+  userId         Int
+  trackVersionId Int
+  user           User         @relation(fields: [userId], references: [id])
+  trackVersion   TrackVersion @relation(fields: [trackVersionId], references: [id], onDelete: Cascade)
+}
+
+model LabelMember {
+  id      Int          @id @default(autoincrement())
+  status  InviteStatus
+  labelId Int
+  userId  Int
+  label   Label        @relation(fields: [labelId], references: [id])
+  user    User         @relation(fields: [userId], references: [id])
+}
+
+model Label {
+  id             Int           @id @default(autoincrement())
+  name           String
+  websiteUrl     String
+  description    String
+  genre          String
+  profilePicture String?
+  labelMember    LabelMember[]
+  tracks         Track[]
 }
 
 enum Role {
   FEEDBACKGEVER
   MUZIEKPRODUCER
   ADMIN
+}
+
+enum InviteStatus {
+  INVITED
+  ACCEPTED
+  DECLINED
 }

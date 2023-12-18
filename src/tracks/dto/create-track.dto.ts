@@ -7,4 +7,6 @@ export class CreateTrackDto {
   genre: string;
   @IsOptional()
   reviewerIds: string;
+  @IsOptional()
+  labelId: number;
 }

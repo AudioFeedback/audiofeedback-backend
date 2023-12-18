@@ -45,3 +45,13 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## Build docker
+
+```bash
+# build container
+$ docker build -t backend:latest
+
+# run docker compose
+$ docker compose up
+```

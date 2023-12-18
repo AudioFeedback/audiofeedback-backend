@@ -7,6 +7,5 @@ export class CreateFeedbackDto {
   comment: string;
   @IsNotEmpty()
   trackVersionId: number;
-  @IsNotEmpty()
-  timestamp: number;
+  timestamp?: number;
 }

@@ -12,7 +12,10 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Patch,
+  Delete,
 } from "@nestjs/common";
+import { GetTrackDto } from "./dto/get-track.dto";
 import { TracksService } from "./tracks.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
@@ -30,8 +33,12 @@ import {
 import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
-import { GetTrackWithAuthorAndReviewersDto } from "./dto/get-track-with-author-and-reviewers.dto";
+import { GetTrackWithLabelOrReviewersAndAuthor } from "./dto/get-track-with-label-or-reviewers-and.author";
 import { GetReviewTrackDto } from "./dto/get-review-track.dto";
+import { UsersService } from "src/users/users.service";
+import { GetUserDto } from "src/users/dto/get-user.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -39,7 +46,9 @@ export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
     private readonly trackVersionsService: TrackVersionsService,
+    private readonly usersService: UsersService,
   ) {}
+
   @Post()
   @Roles(Role.MUZIEKPRODUCER)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -58,6 +67,7 @@ export class TracksController {
             type: "integer",
           },
         },
+        labelId: { type: "number" },
         file: {
           type: "string",
           format: "binary",
@@ -70,20 +80,26 @@ export class TracksController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
   ) {
-    const track = await this.tracksService.create(
-      createTrackDto,
-      <User>req.user,
-    );
+    if (createTrackDto.labelId && createTrackDto.reviewerIds) {
+      throw new HttpException(
+        "Both label & reviewers provided",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     const fileData = await this.tracksService.saveFile(file);
 
     if (!fileData) {
-      // Todo: delete the created track
       throw new HttpException(
         "Error in het opslaan van het bestand.",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    const track = await this.tracksService.create(
+      createTrackDto,
+      <User>req.user,
+    );
 
     const trackVersionData: TrackVersionData = {
       id: track.id,
@@ -97,7 +113,7 @@ export class TracksController {
     const trackVersion =
       await this.trackVersionsService.create(trackVersionData);
 
-    return new GetTrackWithAuthorAndReviewersDto(track, trackVersion, req);
+    return new GetTrackWithLabelOrReviewersAndAuthor(track, trackVersion, req);
   }
 
   @Post("/:trackId")
@@ -162,7 +178,7 @@ export class TracksController {
     const tracks = await this.tracksService.findAll(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorDto(x);
+      return new GetTrackWithAuthorDto(x, <User>req.user);
     });
   }
 
@@ -190,15 +206,16 @@ export class TracksController {
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.MUZIEKPRODUCER)
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
   async findOne(@Param("id") id: number, @Req() req: Request) {
-    const track = await this.tracksService.findOneDeep(+id);
+    const track = await this.tracksService.findOneDeep(+id, <User>req.user);
 
-    if (!track)
+    if (!track) {
       throw new HttpException(
         `Track with ID:${id} not found`,
         HttpStatus.NOT_FOUND,
       );
+    }
     return new GetTrackDeepDto(track, req);
   }
 
@@ -219,13 +236,51 @@ export class TracksController {
     return new GetReviewTrackDto(track, req);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-  //   return this.tracksService.update(+id, updateTrackDto);
-  // }
+  @Get(":id/assigned-reviewers")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  async getAssignedReviewers(@Param("id") id: number) {
+    const reviewers = await this.usersService.getAssignedReviewers(+id);
+    return reviewers.map((x) => new GetUserDto(x));
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.tracksService.remove(+id);
-  // }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
+  @Patch(":id/reviewers")
+  async updateReviewers(
+    @Param("id") id: string,
+    @Body() updateTrackReviewersDto: UpdateTrackReviewersDto,
+  ) {
+    await this.tracksService.updateReviewers(+id, updateTrackReviewersDto);
+    return true;
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Patch(":trackversionId/publish")
+  async publishFeedback(@Param("trackversionId") id: string) {
+    await this.tracksService.publishReview(+id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
+  @Patch(":id/update")
+  async update(
+    @Param("id") id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    return await this.tracksService.updateTrack(+id, updateTrackDto);
+  }
+
+  @Roles(Role.MUZIEKPRODUCER)
+  @Delete(":id")
+  async remove(@Param("id") id: string) {
+    const res = await this.tracksService.deleteTrack(+id);
+
+    return new GetTrackDto(res);
+  }
 }

@@ -39,8 +39,16 @@ export class FeedbackController {
     @Req() req: Request,
   ) {
     const trackVersion = await this.trackService.findOneTrackVersion(
+      <User>req.user,
       createFeedbackDto.trackVersionId,
     );
+
+    if (!trackVersion)
+      throw new HttpException(
+        "Track version niet gevonden.",
+        HttpStatus.NOT_FOUND,
+      );
+
     const feedback = await this.feedbackService.create(
       createFeedbackDto,
       <User>req.user,
@@ -106,10 +114,16 @@ export class FeedbackController {
   }
 
   @Delete(":id")
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.FEEDBACKGEVER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  remove(@Param("id") id: number) {
-    return this.feedbackService.remove(+id);
+  remove(@Param("id") id: number, @Req() req: Request) {
+    const user = <User>req.user;
+
+    if (user.roles.includes(Role.ADMIN)) {
+      return this.feedbackService.remove(+id);
+    } else if (user.roles.includes(Role.FEEDBACKGEVER)) {
+      return this.feedbackService.removeAsFeedbackgever(+id);
+    }
   }
 }

@@ -15,7 +15,9 @@ export class FeedbackService {
       data: {
         rating: createFeedbackDto.rating,
         comment: createFeedbackDto.comment,
-        timestamp: createFeedbackDto.timestamp,
+        timestamp: createFeedbackDto.timestamp
+          ? createFeedbackDto.timestamp
+          : null,
         user: {
           connect: { id: Number(user.id) },
         },
@@ -71,6 +73,34 @@ export class FeedbackService {
     const existingFeedback = await this.prisma.feedback.findUnique({
       where: { id },
     });
+
+    if (!existingFeedback) {
+      throw new NotFoundException("Feedback with ID ${id} not found");
+    }
+
+    return this.prisma.feedback.delete({ where: { id } });
+  }
+
+  async removeAsFeedbackgever(id: number) {
+    const existingFeedback = await this.prisma.feedback.findUnique({
+      where: {
+        id,
+        NOT: {
+          isPublished: true,
+        },
+      },
+    });
+
+    const feedback = await this.prisma.feedback.findUnique({
+      where: {
+        id,
+        isPublished: true,
+      },
+    });
+
+    if (feedback) {
+      throw new NotFoundException("Feedback with ID ${id} already published");
+    }
 
     if (!existingFeedback) {
       throw new NotFoundException("Feedback with ID ${id} not found");
