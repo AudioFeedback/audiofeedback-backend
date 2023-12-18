@@ -24,6 +24,6 @@ jobs:
       sonar: ${{ secrets.SONAR_TOKEN }}
 
   docker:
-    needs: [ testing, linting, sonar ]
+    needs: [ test-unit, linting, sonar ]
     uses: ./.github/workflows/action_docker_publish.yml
     secrets: inherit
