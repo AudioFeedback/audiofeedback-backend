@@ -1,0 +1,25 @@
+on: workflow_call
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Add short SHA to env
+        run: |
+          echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Docker Login
+        run: |
+          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/audiofeedback-backend:$RELEASE_VERSION .
+          docker build -t ${{ secrets.DOCKER_USER }}/audiofeedback-backend:latest .
+
+      - name: Docker Push
+        run: |
+          docker push ${{ secrets.DOCKER_USER }}/audiofeedback-backend:$RELEASE_VERSION
+          docker push ${{ secrets.DOCKER_USER }}/audiofeedback-backend:latest
