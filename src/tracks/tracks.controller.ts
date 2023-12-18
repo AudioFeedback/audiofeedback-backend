@@ -261,7 +261,7 @@ export class TracksController {
   @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @Patch(":trackversionId/publish")
-  async publishFeedback(@Param("trackversionId") id: string) {
+  async publishFeedback(@Param("trackversionId") id: number) {
     return await this.tracksService.publishReview(+id);
   }
 
@@ -276,6 +276,8 @@ export class TracksController {
     return await this.tracksService.updateTrack(+id, updateTrackDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(Role.MUZIEKPRODUCER)
   @Delete(":id")
   async remove(@Param("id") id: string) {
