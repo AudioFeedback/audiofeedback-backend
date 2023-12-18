@@ -13,7 +13,7 @@ services:
       - '0.0.0.0:5432:5432'
 
   app:
-    image: backend:latest
+    image: nieko3/audiofeedback-backend:latest
     container_name: backend
     env_file:
       - docker.env
