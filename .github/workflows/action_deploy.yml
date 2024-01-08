@@ -13,6 +13,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
           script: |
+            source ~/.nvm/nvm.sh
             cd ~/audiofeedback-backend/
             docker compose down
             pm2 kill
