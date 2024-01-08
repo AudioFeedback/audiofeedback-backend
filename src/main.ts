@@ -44,13 +44,16 @@ async function bootstrap() {
 
   await app.init();
 
-  const httpsOptions = {
-    key: fs.readFileSync("./secrets/privkey.pem"),
-    cert: fs.readFileSync("./secrets/cacert.pem"),
-  };
-
   http.createServer(server).listen(3000);
-  https.createServer(httpsOptions, server).listen(443);
+
+  if (process.env.PRIVATE_KEY_PATH && process.env.CERTIFICATE_PATH) {
+    const httpsOptions = {
+      key: fs.readFileSync(process.env.PRIVATE_KEY_PATH),
+      cert: fs.readFileSync(process.env.CERTIFICATE_PATH),
+    };
+
+    https.createServer(httpsOptions, server).listen(443);
+  }
 
   // Dit stukje code zorgt ervoor dat "hot reloading" werkt in development
   if (module.hot) {
