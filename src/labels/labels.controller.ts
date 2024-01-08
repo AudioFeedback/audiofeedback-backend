@@ -250,6 +250,9 @@ export class LabelsController {
   }
 
   @Get(":id/reviewers")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
   async getAvailableReviewers(@Param("id") labelId: number) {
     const reviewers = await this.labelsService.getAvailableReviewers(+labelId);
     return reviewers.map((x) => new GetUserDto(x));
