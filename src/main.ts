@@ -52,7 +52,7 @@ async function bootstrap() {
       cert: fs.readFileSync(process.env.CERTIFICATE_PATH),
     };
 
-    https.createServer(httpsOptions, server).listen(443);
+    https.createServer(httpsOptions, server).listen(3001);
   }
 
   // Dit stukje code zorgt ervoor dat "hot reloading" werkt in development
