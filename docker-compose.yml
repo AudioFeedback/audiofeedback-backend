@@ -10,21 +10,21 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
-      - '0.0.0.0:5432:5432'
+      - '127.0.0.1:5432:5432'
 
-  app:
-    image: nieko3/audiofeedback-backend:latest
-    container_name: backend
-    env_file:
-      - docker.env
-    environment:
-      - PORT=${PORT}
-      - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres?schema=public
-      - JWT_SECRET=generate secret string here
-    ports:
-      - '3000:3000'
-    depends_on:
-      - db
-    volumes:
-      - ./src:/app/src
-      - ./audio:/app/audio
+#  app:
+#    image: nieko3/audiofeedback-backend:latest
+#    container_name: backend
+#    env_file:
+#      - docker.env
+#    environment:
+#      - PORT=${PORT}
+#      - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres?schema=public
+#      - JWT_SECRET=generate secret string here
+#    ports:
+#      - '3000:3000'
+#    depends_on:
+#      - db
+#    volumes:
+#      - ./src:/app/src
+#      - ./audio:/app/audio

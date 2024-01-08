@@ -1,0 +1,39 @@
+on: workflow_call
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Connect to server
+        run: |
+          sh ${{ secrets.SSH_CONNECT }}
+          ${{ secrets.SSH_PASSWORD }}
+
+      - name: Set active directory
+        run: cd ~/audiofeedback-backend/
+
+      - name: Shutdown docker compose
+        run: docker compose down
+
+      - name: Kill pm2 processes
+        run: pm2 kill
+
+      - name: Pull repository
+        run: git pull
+
+      - name: Start docker compose
+        run: docker compose up
+
+      - name: Install packages
+        run: npm install
+
+      - name: Build back-end
+        run: npm run build
+
+      - name: Start back-end
+        run: pm2 run start:prod
+
+      - name: Exit SSH
+        run: exit

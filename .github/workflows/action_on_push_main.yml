@@ -27,3 +27,8 @@ jobs:
     needs: [ test-unit, linting, sonarcloud ]
     uses: ./.github/workflows/action_docker_publish.yml
     secrets: inherit
+
+  deploy:
+    needs: [ docker ]
+    uses: ./.github/workflows/action_deploy.yml
+    secrets: inherit
