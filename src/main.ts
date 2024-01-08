@@ -49,8 +49,8 @@ async function bootstrap() {
     cert: fs.readFileSync("./secrets/cacert.pem"),
   };
 
-  const httpServer = http.createServer(server).listen(3000);
-  const httpsServer = https.createServer(httpsOptions, server).listen(443);
+  http.createServer(server).listen(3000);
+  https.createServer(httpsOptions, server).listen(443);
 
   // Dit stukje code zorgt ervoor dat "hot reloading" werkt in development
   if (module.hot) {
@@ -60,4 +60,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
