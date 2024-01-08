@@ -4,36 +4,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Connect to server
-        run: |
-          sh ${{ secrets.SSH_CONNECT }}
-          ${{ secrets.SSH_PASSWORD }}
-
-      - name: Set active directory
-        run: cd ~/audiofeedback-backend/
-
-      - name: Shutdown docker compose
-        run: docker compose down
-
-      - name: Kill pm2 processes
-        run: pm2 kill
-
-      - name: Pull repository
-        run: git pull
-
-      - name: Start docker compose
-        run: docker compose up
-
-      - name: Install packages
-        run: npm install
-
-      - name: Build back-end
-        run: npm run build
-
-      - name: Start back-end
-        run: pm2 run start:prod
-
-      - name: Exit SSH
-        run: exit
+      - name: print out example job
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          command_timeout: 30m
+          script: |
+            cd ~/audiofeedback-backend/
+            docker compose down
+            pm2 kill
+            git pull
+            docker compose up
+            npm install
+            npm run build
+            pm2 run start:prod
