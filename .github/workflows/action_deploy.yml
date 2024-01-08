@@ -21,4 +21,4 @@ jobs:
             docker compose up -d
             npm install
             npm run build
-            pm2 start start:prod
+            pm2 start npm start:prod
