@@ -65,12 +65,12 @@ export class GetTrackWithReviewersDto {
     const trackversion = track.trackVersions[0];
 
     if (user.roles.includes("ADMIN")) {
-      if (trackversion.feedback.length === 0) {
-        trackStatus.push(TrackStatus.READY_TO_REVIEW);
-      } else if (!trackversion.isReviewed) {
+      if (trackversion.isReviewed) {
+        trackStatus.push(TrackStatus.SEND);
+      } else if (this.reviewers.every((x) => x.isReviewed == true)) {
         trackStatus.push(TrackStatus.READY_TO_SEND);
       } else {
-        trackStatus.push(TrackStatus.SEND);
+        trackStatus.push(TrackStatus.READY_TO_REVIEW);
       }
     }
 
