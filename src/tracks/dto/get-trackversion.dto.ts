@@ -21,7 +21,7 @@ export class GetTrackVersionDto {
     this.description = trackVersion.description;
     this.guid = trackVersion.guid;
     this.filetype = trackVersion.filetype;
-    this.fullUrl = `${req.get("Host") ?? req.headers["x-host-address"]}/tracks/audio/${trackVersion.guid}.${
+    this.fullUrl = `${req.headers["x-host-address"] ?? req.get("Host")}/tracks/audio/${trackVersion.guid}.${
       trackVersion.filetype
     }`;
     this.duration = trackVersion.duration;
