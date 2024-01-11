@@ -1,4 +1,5 @@
 import { Prisma, User } from "@prisma/client";
+import { getStatus } from "src/labels/utils/utils";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
@@ -35,39 +36,6 @@ export class GetTrackWithAuthorDto {
     this.title = track.title;
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
-    this.status = this.getStatus(track, user);
-  }
-
-  getStatus(track: TrackWithAuthor, user: User): TrackStatus[] {
-    const trackStatus = [];
-    const trackversion = track.trackVersions[0];
-
-    if (user.roles.includes("ADMIN")) {
-      if (trackversion.feedback.length === 0) {
-        trackStatus.push(TrackStatus.READY_TO_REVIEW);
-      } else if (!trackversion.isReviewed) {
-        trackStatus.push(TrackStatus.READY_TO_SEND);
-      } else {
-        trackStatus.push(TrackStatus.SEND);
-      }
-    }
-
-    if (user.roles.includes("FEEDBACKGEVER")) {
-      if (trackversion.feedback.length === 0) {
-        trackStatus.push(TrackStatus.READY_TO_REVIEW);
-      } else {
-        trackStatus.push(TrackStatus.REVIEWED);
-      }
-    }
-
-    if (user.roles.includes("MUZIEKPRODUCER")) {
-      if (trackversion.isReviewed) {
-        trackStatus.push(TrackStatus.REVIEWED);
-      } else {
-        trackStatus.push(TrackStatus.PENDING_REVIEW);
-      }
-    }
-
-    return trackStatus;
+    this.status = getStatus(track, user);
   }
 }
