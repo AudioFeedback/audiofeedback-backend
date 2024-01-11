@@ -69,44 +69,34 @@ export class FeedbackService {
     return updatedFeedback;
   }
 
-  async remove(id: number) {
-    const existingFeedback = await this.prisma.feedback.findUnique({
-      where: { id },
+  async isAllowedForDelete(id: number) {
+    return await this.prisma.feedback.findUnique({
+      where: {
+        id,
+        trackVersion: {
+          isReviewed: false,
+        },
+      },
     });
+  }
 
-    if (!existingFeedback) {
-      throw new NotFoundException("Feedback with ID ${id} not found");
-    }
-
+  async remove(id: number) {
     return this.prisma.feedback.delete({ where: { id } });
   }
 
   async removeAsFeedbackgever(id: number) {
-    const existingFeedback = await this.prisma.feedback.findUnique({
+    return await this.prisma.feedback.findUnique({
       where: {
         id,
-        NOT: {
-          isPublished: true,
-        },
+        isPublished: false,
       },
     });
 
-    const feedback = await this.prisma.feedback.findUnique({
-      where: {
-        id,
-        isPublished: true,
-      },
-    });
-
-    if (feedback) {
-      throw new NotFoundException("Feedback with ID ${id} already published");
-    }
-
-    if (!existingFeedback) {
-      throw new NotFoundException("Feedback with ID ${id} not found");
-    }
-
-    return this.prisma.feedback.delete({ where: { id } });
+    // if (feedback) {
+    //   throw new NotFoundException("Feedback with ID ${id} already published");
+    // } else if (!existingFeedback) {
+    //   throw new NotFoundException("Feedback with ID ${id} not found");
+    // }
   }
 
   async publishFeedback(trackId: number, user: User) {

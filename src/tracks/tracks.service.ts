@@ -171,6 +171,11 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          reviewers: {
+            include: {
+              feedback: true,
+            },
+          },
           trackVersions: {
             orderBy: {
               createdAt: "asc",
@@ -194,6 +199,11 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          reviewers: {
+            include: {
+              feedback: true,
+            },
+          },
           trackVersions: {
             orderBy: {
               createdAt: "asc",
@@ -357,6 +367,25 @@ export class TracksService {
       },
     });
   }
+
+  // async removeReviewers(
+  //   id: number,
+  // ) {
+  //   const track = await this.prisma.track.findUnique({
+  //     where: { id: id },
+  //     include: {
+  //       trackVersions: {
+  //         include: {
+  //           feedback: true,
+  //         },
+  //       },
+  //     },
+  //   });
+
+  //   if (!track) {
+  //     throw new NotFoundException(`Track with ID ${id} not found`);
+  //   }
+  // }
 
   async updateTrack(id: number, updateTrackDto: UpdateTrackDto) {
     const existingTrack = await this.prisma.track.findUnique({

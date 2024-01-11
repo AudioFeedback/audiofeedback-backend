@@ -13,6 +13,7 @@ export class GetUserWithLabelMemberDto {
   id: number;
   firstname: string;
   lastname: string;
+  username: string;
   roles: Role[];
   labelMember: GetLabelMemberDto[];
 
@@ -21,6 +22,7 @@ export class GetUserWithLabelMemberDto {
     this.firstname = user.firstname;
     this.lastname = user.lastname;
     this.roles = user.roles;
+    this.username = user.username;
     this.labelMember = user.labelMember.map((x) => new GetLabelMemberDto(x));
   }
 }

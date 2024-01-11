@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  NotFoundException,
 } from "@nestjs/common";
 import { FeedbackService } from "./feedback.service";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
@@ -117,13 +118,31 @@ export class FeedbackController {
   @Roles(Role.ADMIN, Role.FEEDBACKGEVER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  remove(@Param("id") id: number, @Req() req: Request) {
+  async remove(@Param("id") id: number, @Req() req: Request) {
     const user = <User>req.user;
 
     if (user.roles.includes(Role.ADMIN)) {
+      const existingFeedback = await this.feedbackService.isAllowedForDelete(
+        +id,
+      );
+
+      if (!existingFeedback) {
+        throw new NotFoundException(
+          "Feedback with ID ${id} not found or already reviewed",
+        );
+      }
       return this.feedbackService.remove(+id);
     } else if (user.roles.includes(Role.FEEDBACKGEVER)) {
-      return this.feedbackService.removeAsFeedbackgever(+id);
+      const existingFeedback = await this.feedbackService.removeAsFeedbackgever(
+        +id,
+      );
+
+      if (!existingFeedback) {
+        throw new NotFoundException(
+          "Feedback with ID ${id} not found or feedback is already published",
+        );
+      }
+      return this.feedbackService.remove(+id);
     }
   }
 }
