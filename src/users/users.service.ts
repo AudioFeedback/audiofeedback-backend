@@ -103,7 +103,7 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new NotFoundException(`You are not logged in`);
+      throw new NotFoundException(`You are not logged in.`);
     }
 
     const updatedUserPassword = await this.prisma.user.update({
