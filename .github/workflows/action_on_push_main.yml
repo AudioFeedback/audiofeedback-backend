@@ -22,3 +22,13 @@ jobs:
     secrets:
       github: ${{ secrets.GITHUB_TOKEN }}
       sonar: ${{ secrets.SONAR_TOKEN }}
+
+  docker:
+    needs: [ test-unit, linting, sonarcloud ]
+    uses: ./.github/workflows/action_docker_publish.yml
+    secrets: inherit
+
+  deploy:
+    needs: [ docker ]
+    uses: ./.github/workflows/action_deploy.yml
+    secrets: inherit
