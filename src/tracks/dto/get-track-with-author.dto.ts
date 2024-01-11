@@ -5,6 +5,11 @@ import { GetUserDto } from "src/users/dto/get-user.dto";
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: {
     author: true,
+    reviewers: {
+      include: {
+        feedback: true,
+      },
+    },
     trackVersions: {
       include: {
         feedback: true,

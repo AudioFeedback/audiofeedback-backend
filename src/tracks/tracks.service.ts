@@ -171,6 +171,11 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          reviewers: {
+            include: {
+              feedback: true,
+            },
+          },
           trackVersions: {
             orderBy: {
               createdAt: "asc",
@@ -194,6 +199,11 @@ export class TracksService {
       return this.prisma.track.findMany({
         include: {
           author: true,
+          reviewers: {
+            include: {
+              feedback: true,
+            },
+          },
           trackVersions: {
             orderBy: {
               createdAt: "asc",
