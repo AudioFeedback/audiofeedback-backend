@@ -1,5 +1,5 @@
 ## Description
-
+first
 [AudioFeedback](https://github.com/AudioFeedback/backend) AudioFeedback challenge ID
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=AudioFeedback_backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=AudioFeedback_backend)
@@ -44,4 +44,14 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+```
+
+## Build docker
+
+```bash
+# build container
+$ docker build -t backend:latest
+
+# run docker compose
+$ docker compose up
 ```

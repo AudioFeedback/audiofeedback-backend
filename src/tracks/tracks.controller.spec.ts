@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { UsersService } from "../users/users.service";
 import { TracksController } from "./tracks.controller";
 import { TracksService } from "./tracks.service";
 import { TrackVersionsService } from "./trackversions.service";
@@ -11,7 +12,7 @@ describe("TracksController", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TracksController],
-      providers: [TracksService, TrackVersionsService, PrismaService],
+      providers: [TracksService, TrackVersionsService, UsersService, PrismaService],
     })
       .overrideProvider(PrismaService)
       .useValue(mockDeep<PrismaService>())
