@@ -253,7 +253,6 @@ export class LabelsController {
     @Req() req: Request,
   ) {
     const labels = await this.labelsService.getAllTracksForLabel(+labelId);
-
     return labels.map(
       (x) => new GetTrackWithReviewersDto(x, <User>req.user, req),
     );

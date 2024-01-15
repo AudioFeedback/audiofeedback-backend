@@ -27,7 +27,9 @@ export class GetReviewerDto {
 
   getReviewed(feedback: Feedback[], trackVersion: TrackVersion) {
     return (
-      feedback.filter((x) => x.trackVersionId === trackVersion.id).length > 0
+      feedback.filter(
+        (x) => x.trackVersionId === trackVersion.id && x.isPublished === true,
+      ).length > 0
     );
   }
 }
