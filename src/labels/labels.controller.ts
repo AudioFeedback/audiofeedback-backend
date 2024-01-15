@@ -34,6 +34,26 @@ export class LabelsController {
     private readonly userService: UsersService,
   ) {}
 
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.FEEDBACKGEVER, Role.ADMIN, Role.MUZIEKPRODUCER)
+  async getLabels() {
+    const labels = await this.labelsService.getLabels();
+
+    return labels.map((x) => new GetLabelDto(x));
+  }
+
+  @Get("assigned")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.FEEDBACKGEVER, Role.ADMIN, Role.MUZIEKPRODUCER)
+  async getAssignedLabels(@Req() req: Request) {
+    const labels = await this.labelsService.getAssignedLabels(<User>req.user);
+
+    return labels.map((x) => new GetLabelDto(x));
+  }
+
   @Get("invites")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
@@ -214,16 +234,6 @@ export class LabelsController {
       +inviteUser.labelMemberId,
       InviteStatus.DECLINED,
     );
-  }
-
-  @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @ApiBearerAuth()
-  @Roles(Role.FEEDBACKGEVER, Role.ADMIN, Role.MUZIEKPRODUCER)
-  async getLabels() {
-    const labels = await this.labelsService.getLabels();
-
-    return labels.map((x) => new GetLabelDto(x));
   }
 
   @Get(":id")

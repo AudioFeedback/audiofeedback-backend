@@ -23,6 +23,18 @@ export class LabelsService {
     return this.prisma.label.findMany();
   }
 
+  async getAssignedLabels(user: User) {
+    return this.prisma.label.findMany({
+      where: {
+        labelMember: {
+          some: {
+            userId: user.id,
+          },
+        },
+      },
+    });
+  }
+
   async getAllTracksForLabel(labelId: number) {
     return this.prisma.track.findMany({
       where: {
