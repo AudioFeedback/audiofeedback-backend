@@ -251,6 +251,14 @@ export class TracksService {
     });
   }
 
+  findTrackVersion(id: number) {
+    return this.prisma.trackVersion.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  }
+
   findOneDeep(id: number, user: User) {
     if (user.roles.includes(Role.MUZIEKPRODUCER)) {
       return this.prisma.track.findUnique({
@@ -447,6 +455,12 @@ export class TracksService {
     });
 
     return this.prisma.track.delete({
+      where: { id: id },
+    });
+  }
+
+  async deleteTrackVersion(id: number) {
+    return this.prisma.trackVersion.delete({
       where: { id: id },
     });
   }
