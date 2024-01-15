@@ -52,14 +52,14 @@ export class GetTrackWithReviewersDto {
     this.title = track.title;
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
-    if (track.reviewers) {
-      this.reviewers = track.reviewers.map(
-        (x) => new GetReviewerDto(x, track.trackVersions[0]),
-      );
-    } else {
-      this.reviewers = [];
-    }
-    this.status = getStatus(track, user);
+    this.reviewers = track.reviewers.map(
+      (x) =>
+        new GetReviewerDto(
+          x,
+          track.trackVersions[track.trackVersions.length - 1],
+        ),
+    );
+    this.status = getStatus(track, user, this.reviewers);
     this.trackversions = track.trackVersions.map(
       (x) => new GetTrackVersionDto(x, req),
     );
