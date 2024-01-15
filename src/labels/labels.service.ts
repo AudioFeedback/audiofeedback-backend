@@ -48,7 +48,6 @@ export class LabelsService {
           include: {
             feedback: {
               where: {
-                isPublished: true,
                 trackVersion: {
                   track: {
                     labelId: labelId,
@@ -60,11 +59,7 @@ export class LabelsService {
         },
         trackVersions: {
           include: {
-            feedback: {
-              where: {
-                isPublished: true,
-              },
-            },
+            feedback: true,
           },
         },
       },
