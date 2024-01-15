@@ -56,6 +56,8 @@ export class GetTrackWithReviewersDto {
       this.reviewers = track.reviewers.map(
         (x) => new GetReviewerDto(x, track.trackVersions[0]),
       );
+    } else {
+      this.reviewers = [];
     }
     this.status = getStatus(track, user);
     this.trackversions = track.trackVersions.map(
