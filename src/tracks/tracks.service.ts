@@ -474,4 +474,19 @@ export class TracksService {
       console.error(e);
     }
   }
+
+  async getTrackFromTrackVersion(trackVersionId: number) {
+    const trackversion = await this.prisma.trackVersion.findUnique({
+      where: { id: trackVersionId },
+      include: {
+        track: {
+          include: {
+            label: true,
+          },
+        },
+      },
+    });
+
+    return trackversion.track;
+  }
 }
