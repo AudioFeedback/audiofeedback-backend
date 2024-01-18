@@ -202,7 +202,7 @@ export class TracksController {
     res.setHeader("Content-Type", "audio/mpeg");
     await res.end(file);
   }
-  
+
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
@@ -283,9 +283,9 @@ export class TracksController {
   async removeReviewers(
     @Param("id") id: number,
     @Param("reviewerId") reviewerId: number,
-    ) {
-      return await this.tracksService.removeReviewers(+id, +reviewerId);
-    }
+  ) {
+    return await this.tracksService.removeReviewers(+id, +reviewerId);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()

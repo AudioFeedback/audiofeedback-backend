@@ -12,7 +12,12 @@ describe("TracksController", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TracksController],
-      providers: [TracksService, TrackVersionsService, UsersService, PrismaService],
+      providers: [
+        TracksService,
+        TrackVersionsService,
+        UsersService,
+        PrismaService,
+      ],
     })
       .overrideProvider(PrismaService)
       .useValue(mockDeep<PrismaService>())

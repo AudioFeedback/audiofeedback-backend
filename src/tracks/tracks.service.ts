@@ -9,7 +9,6 @@ import * as mm from "music-metadata";
 import { UpdateTrackDto } from "./dto/update-track.dto";
 // import { UpdateTrackDto } from "./dto/update-track.dto";
 import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
-import { contains } from "class-validator";
 
 @Injectable()
 export class TracksService {
@@ -412,16 +411,16 @@ export class TracksService {
 
   async removeReviewers(id: number, reviewerId: number) {
     const removeReviewers = this.prisma.track.update({
-      where: { 
+      where: {
         id,
       },
       data: {
         reviewers: {
           disconnect: {
-            id: reviewerId
-          }
-        }
-      }
+            id: reviewerId,
+          },
+        },
+      },
     });
     return removeReviewers;
   }
