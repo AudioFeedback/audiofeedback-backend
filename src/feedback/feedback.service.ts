@@ -99,10 +99,34 @@ export class FeedbackService {
     // }
   }
 
-  async publishFeedback(trackId: number, user: User) {
+  async publishFeedback(trackVersionId: number, user: User) {
+    const track = await this.prisma.track.findFirst({
+      where: {
+        trackVersions: {
+          some: {
+            id: trackVersionId,
+          },
+        },
+      },
+      include: {
+        label: true,
+      },
+    });
+
+    if (track.label === null) {
+      await this.prisma.trackVersion.update({
+        data: {
+          isReviewed: true,
+        },
+        where: {
+          id: trackVersionId,
+        },
+      });
+    }
+
     return this.prisma.feedback.updateMany({
       where: {
-        trackVersionId: trackId,
+        trackVersionId: trackVersionId,
         userId: user.id,
       },
       data: {
