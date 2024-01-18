@@ -33,12 +33,12 @@ import {
 import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
 import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
 import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
-import { GetTrackWithLabelOrReviewersAndAuthor } from "./dto/get-track-with-label-or-reviewers-and.author";
 import { GetReviewTrackDto } from "./dto/get-review-track.dto";
 import { UsersService } from "src/users/users.service";
 import { GetUserDto } from "src/users/dto/get-user.dto";
-import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 import { UpdateTrackDto } from "./dto/update-track.dto";
+import { GetTrackWithLabelOrReviewersAndAuthor } from "./dto/get-track-with-label-or-reviewers-and.author.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -173,7 +173,7 @@ export class TracksController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN)
+  @Roles(Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER)
   async findAll(@Req() req: Request) {
     const tracks = await this.tracksService.findAll(<User>req.user);
 
@@ -267,6 +267,28 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  @Delete("trackversion/:trackversionId")
+  async deleteTrackVersion(@Param("trackversionId") id: number) {
+    const trackVersion = await this.tracksService.findTrackVersion(+id);
+
+    if (!trackVersion) {
+      throw new HttpException(
+        `Track version with ID:${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const res = this.tracksService.deleteTrackVersion(+id);
+    await this.tracksService.deleteFile(
+      `${trackVersion.guid}.${trackVersion.filetype}`,
+    );
+
+    return res;
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
   @Roles(Role.MUZIEKPRODUCER, Role.ADMIN)
   @Patch(":id/update")
   async update(
@@ -274,6 +296,17 @@ export class TracksController {
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
     return await this.tracksService.updateTrack(+id, updateTrackDto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  @Delete(":id/reviewers/:reviewerId")
+  async removeReviewers(
+    @Param("id") id: number,
+    @Param("reviewerId") reviewerId: number,
+  ) {
+    return await this.tracksService.removeReviewers(+id, +reviewerId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

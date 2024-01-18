@@ -245,6 +245,14 @@ export class TracksService {
     });
   }
 
+  findTrackVersion(id: number) {
+    return this.prisma.trackVersion.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  }
+
   findOneDeep(id: number, user: User) {
     if (user.roles.includes(Role.MUZIEKPRODUCER)) {
       return this.prisma.track.findUnique({
@@ -399,8 +407,24 @@ export class TracksService {
     return updatedTrack;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  // remove(id: number) {
+  //   return `This action removes a #${id} track`;
+  // }
+
+  async removeReviewers(id: number, reviewerId: number) {
+    const removeReviewers = this.prisma.track.update({
+      where: {
+        id,
+      },
+      data: {
+        reviewers: {
+          disconnect: {
+            id: reviewerId,
+          },
+        },
+      },
+    });
+    return removeReviewers;
   }
 
   async getAudioFile(filename: string) {
@@ -445,6 +469,12 @@ export class TracksService {
     });
   }
 
+  async deleteTrackVersion(id: number) {
+    return this.prisma.trackVersion.delete({
+      where: { id: id },
+    });
+  }
+
   async deleteFile(fileName: string) {
     try {
       const rootDir = process.cwd();
@@ -453,5 +483,20 @@ export class TracksService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async getTrackFromTrackVersion(trackVersionId: number) {
+    const trackversion = await this.prisma.trackVersion.findUnique({
+      where: { id: trackVersionId },
+      include: {
+        track: {
+          include: {
+            label: true,
+          },
+        },
+      },
+    });
+
+    return trackversion.track;
   }
 }

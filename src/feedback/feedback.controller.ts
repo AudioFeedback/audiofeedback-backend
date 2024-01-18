@@ -111,6 +111,17 @@ export class FeedbackController {
       +trackVersionId,
       <User>req.user,
     );
+
+    // determine is a label is connected to this track
+
+    const track = await this.trackService.getTrackFromTrackVersion(
+      +trackVersionId,
+    );
+
+    if (track.label === null) {
+      this.trackService.publishReview(+trackVersionId);
+    }
+
     return feedback.map((x) => new GetFeedbackDto(x));
   }
 
