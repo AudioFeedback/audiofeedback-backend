@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -281,5 +282,21 @@ export class LabelsController {
     const labels = await this.labelsService.getLabelTypeahead(query);
 
     return labels.map((x) => new GetLabelDto(x));
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @Delete(":id/reviewers/:reviewerId/:labelMemberId")
+  async removeReviewers(
+    @Param("id") id: number,
+    @Param("reviewerId") reviewerId: number,
+    @Param("labelMemberId") labelMemberId: number,
+  ) {
+    return await this.labelsService.removeReviewers(
+      +id,
+      +reviewerId,
+      +labelMemberId,
+    );
   }
 }
