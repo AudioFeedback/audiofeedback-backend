@@ -413,8 +413,24 @@ export class TracksService {
     return updatedTrack;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} track`;
+  // remove(id: number) {
+  //   return `This action removes a #${id} track`;
+  // }
+
+  async removeReviewers(id: number, reviewerId: number) {
+    const removeReviewers = this.prisma.track.update({
+      where: {
+        id,
+      },
+      data: {
+        reviewers: {
+          disconnect: {
+            id: reviewerId,
+          },
+        },
+      },
+    });
+    return removeReviewers;
   }
 
   async getAudioFile(filename: string) {

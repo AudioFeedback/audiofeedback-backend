@@ -301,6 +301,17 @@ export class TracksController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Roles(Role.MUZIEKPRODUCER)
+  @Delete(":id/reviewers/:reviewerId")
+  async removeReviewers(
+    @Param("id") id: number,
+    @Param("reviewerId") reviewerId: number,
+  ) {
+    return await this.tracksService.removeReviewers(+id, +reviewerId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
   @Delete(":id")
   async remove(@Param("id") id: string) {
     const res = await this.tracksService.deleteTrack(+id);
