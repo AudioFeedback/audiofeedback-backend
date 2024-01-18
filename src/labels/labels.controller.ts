@@ -284,6 +284,10 @@ export class LabelsController {
     @Param("reviewerId") reviewerId: number,
     @Param("labelMemberId") labelMemberId: number,
   ) {
-    return await this.labelsService.removeReviewers(+id, +reviewerId, +labelMemberId);
+    return await this.labelsService.removeReviewers(
+      +id,
+      +reviewerId,
+      +labelMemberId,
+    );
   }
 }
