@@ -7,12 +7,21 @@ export function getStatus(
   user: User,
 ): TrackStatus[] {
   const trackStatus = [];
-  const trackversion = track.trackVersions[0];
+  const trackversion = track.trackVersions[track.trackVersions.length - 1];
 
   if (user.roles.includes("ADMIN")) {
     if (trackversion.isReviewed) {
       trackStatus.push(TrackStatus.SEND);
-    } else if (this.reviewers.every((x) => x.isReviewed == true)) {
+    } else if (
+      track.reviewers
+        .map((x) => x.id)
+        .every((x) =>
+          trackversion.feedback
+            .filter((x) => x.isPublished)
+            .map((y) => y.userId)
+            .includes(x),
+        )
+    ) {
       trackStatus.push(TrackStatus.READY_TO_SEND);
     } else {
       trackStatus.push(TrackStatus.READY_TO_REVIEW);

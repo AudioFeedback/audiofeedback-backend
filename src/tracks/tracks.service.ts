@@ -177,9 +177,6 @@ export class TracksService {
             },
           },
           trackVersions: {
-            orderBy: {
-              createdAt: "asc",
-            },
             include: {
               feedback: {
                 where: {
@@ -205,9 +202,6 @@ export class TracksService {
             },
           },
           trackVersions: {
-            orderBy: {
-              createdAt: "asc",
-            },
             include: {
               feedback: {
                 where: {
