@@ -278,7 +278,7 @@ export class TracksController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.MUZIEKPRODUCER)
+  @Roles(Role.ADMIN)
   @Delete(":id/reviewers/:reviewerId")
   async removeReviewers(
     @Param("id") id: number,

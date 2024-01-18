@@ -136,6 +136,23 @@ export class LabelsService {
     });
   }
 
+  async removeReviewers(id: number, reviewerId: number, labelMemberId) {
+    console.log(id, reviewerId, labelMemberId);
+    const removeReviewers = this.prisma.labelMember.delete({
+      where: {
+        id: labelMemberId,
+        user: {
+          id: reviewerId,
+        },
+        label: {
+          id,
+        },
+      },
+    });
+
+    return removeReviewers;
+  }
+
   async setInviteStatus(labelMemberId: number, status: InviteStatus) {
     return this.prisma.labelMember.update({
       data: {
