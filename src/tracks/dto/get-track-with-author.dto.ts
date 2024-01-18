@@ -1,6 +1,5 @@
 import { Prisma, User } from "@prisma/client";
 import { getStatus } from "src/labels/utils/utils";
-import { GetReviewerDto } from "src/users/dto/get-reviewer.dto";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
@@ -42,16 +41,6 @@ export class GetTrackWithAuthorDto {
     this.title = track.title;
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
-    this.status = getStatus(
-      track,
-      user,
-      track.reviewers.map(
-        (x) =>
-          new GetReviewerDto(
-            x,
-            track.trackVersions[track.trackVersions.length - 1],
-          ),
-      ),
-    );
+    this.status = getStatus(track, user);
   }
 }

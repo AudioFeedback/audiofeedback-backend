@@ -59,7 +59,7 @@ export class GetTrackWithReviewersDto {
           track.trackVersions[track.trackVersions.length - 1],
         ),
     );
-    this.status = getStatus(track, user, this.reviewers);
+    this.status = getStatus(track, user);
     this.trackversions = track.trackVersions.map(
       (x) => new GetTrackVersionDto(x, req),
     );
