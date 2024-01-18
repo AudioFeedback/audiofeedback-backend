@@ -1,4 +1,5 @@
-import { InviteStatus, LabelMember } from "@prisma/client";
+import { LabelMember } from "@prisma/client";
+import { InviteStatus } from "src/enums";
 
 export class GetLabelMemberDto {
   id: number;
@@ -6,6 +7,6 @@ export class GetLabelMemberDto {
 
   constructor(labelMember: LabelMember) {
     this.id = labelMember.id;
-    this.status = labelMember.status;
+    this.status = InviteStatus[labelMember.status];
   }
 }

@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { TrackStatus } from "src/tracks/dto/get-track-with-author.dto";
+import { TrackStatus } from "src/enums";
 import { TrackWithReviewers } from "src/tracks/dto/get-track-with-reviewers.dto";
 
 export function getStatus(

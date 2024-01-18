@@ -4,6 +4,7 @@ import { Request } from "express";
 import { GetReviewerDto } from "../../users/dto/get-reviewer.dto";
 import { GetTrackVersionDto } from "./get-trackversion.dto";
 import { getStatus } from "src/labels/utils/utils";
+import { TrackStatus } from "src/enums";
 
 const trackWithReviewers = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: {
@@ -28,15 +29,6 @@ const trackWithReviewers = Prisma.validator<Prisma.TrackDefaultArgs>()({
 export type TrackWithReviewers = Prisma.TrackGetPayload<
   typeof trackWithReviewers
 >;
-
-export enum TrackStatus {
-  PENDING_REVIEW = "PENDING_REVIEW",
-  READY_TO_REVIEW = "READY_TO_REVIEW",
-  REVIEWED = "REVIEWED",
-  REVIEW_IN_PROGRESS = "REVIEW_IN_PROGRESS",
-  READY_TO_SEND = "READY_TO_SEND",
-  SEND = "SEND",
-}
 
 export class GetTrackWithReviewersDto {
   id: number;
