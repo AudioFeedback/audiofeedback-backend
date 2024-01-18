@@ -17,7 +17,7 @@ export class AppController {
   ) {}
   @Get()
   hello() {
-    return this.appService.getHello();
+    return "🐳  🎀  𝒱𝑒𝓇𝓈𝒾𝑒 𝟤.0  🎀  🐳";
   }
 
   @UseGuards(LocalAuthGuard)

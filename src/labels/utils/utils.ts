@@ -23,6 +23,17 @@ export function getStatus(
         )
     ) {
       trackStatus.push(TrackStatus.READY_TO_SEND);
+    } else if (
+      track.reviewers
+        .map((x) => x.id)
+        .some((x) =>
+          trackversion.feedback
+            .filter((x) => x.isPublished)
+            .map((y) => y.userId)
+            .includes(x),
+        )
+    ) {
+      trackStatus.push(TrackStatus.REVIEW_IN_PROGRESS);
     } else {
       trackStatus.push(TrackStatus.READY_TO_REVIEW);
     }
