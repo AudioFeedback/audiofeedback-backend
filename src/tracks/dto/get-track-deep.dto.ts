@@ -2,10 +2,15 @@ import { Prisma } from "@prisma/client";
 import { Request } from "express";
 import { GetTrackVersionDeepDto } from "./get-trackversion.deep.dto";
 import { GetUserDto } from "src/users/dto/get-user.dto";
+import { GetUserWithLabelMemberDto } from "src/users/dto/get-user-with-labelmember.dto";
 
 const trackDeep = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: {
-    reviewers: true,
+    reviewers: {
+      include: {
+        labelMember: true,
+      },
+    },
     trackVersions: {
       include: {
         feedback: {
@@ -34,6 +39,8 @@ export class GetTrackDeepDto {
     this.trackversions = track.trackVersions.map(
       (x) => new GetTrackVersionDeepDto(x, req),
     );
-    this.reviewers = track.reviewers.map((x) => new GetUserDto(x));
+    this.reviewers = track.reviewers.map(
+      (x) => new GetUserWithLabelMemberDto(x),
+    );
   }
 }

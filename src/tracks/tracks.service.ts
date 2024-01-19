@@ -253,12 +253,19 @@ export class TracksService {
     });
   }
 
-  findOneDeep(id: number, user: User) {
+  async findOneDeep(id: number, user: User) {
     if (user.roles.includes(Role.MUZIEKPRODUCER)) {
       return this.prisma.track.findUnique({
         where: { id: id },
         include: {
-          reviewers: true,
+          reviewers: {
+            where: {
+              id: -1,
+            },
+            include: {
+              labelMember: true,
+            },
+          },
           trackVersions: {
             include: {
               feedback: {
@@ -281,10 +288,23 @@ export class TracksService {
       });
     } else {
       if (user.roles.includes(Role.ADMIN)) {
+        const trackWithLabel = await this.prisma.track.findUnique({
+          where: { id: id },
+          include: { label: true },
+        });
+
         return this.prisma.track.findUnique({
           where: { id: id },
           include: {
-            reviewers: true,
+            reviewers: {
+              include: {
+                labelMember: {
+                  where: {
+                    labelId: trackWithLabel.label.id,
+                  },
+                },
+              },
+            },
             trackVersions: {
               include: {
                 feedback: {
