@@ -170,6 +170,7 @@ export class TracksService {
     if (user.roles.includes("MUZIEKPRODUCER")) {
       return this.prisma.track.findMany({
         include: {
+          label: true,
           author: true,
           reviewers: {
             include: {
@@ -195,6 +196,7 @@ export class TracksService {
     if (user.roles.includes("FEEDBACKGEVER")) {
       return this.prisma.track.findMany({
         include: {
+          label: true,
           author: true,
           reviewers: {
             include: {

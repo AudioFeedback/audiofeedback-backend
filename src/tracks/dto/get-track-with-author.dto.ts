@@ -1,10 +1,12 @@
 import { Prisma, User } from "@prisma/client";
 import { TrackStatus } from "src/enums";
+import { GetLabelDto } from "src/labels/dto/get-label.dto";
 import { getStatus } from "src/labels/utils/utils";
 import { GetUserDto } from "src/users/dto/get-user.dto";
 
 const trackWithAuthor = Prisma.validator<Prisma.TrackDefaultArgs>()({
   include: {
+    label: true,
     author: true,
     reviewers: {
       include: {
@@ -27,6 +29,7 @@ export class GetTrackWithAuthorDto {
   genre: string;
   author: GetUserDto;
   status: TrackStatus[];
+  label: GetLabelDto;
 
   constructor(track: TrackWithAuthor, user: User) {
     this.id = track.id;
@@ -34,5 +37,6 @@ export class GetTrackWithAuthorDto {
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
     this.status = getStatus(track, user);
+    this.label = new GetLabelDto(track.label) ?? null;
   }
 }
