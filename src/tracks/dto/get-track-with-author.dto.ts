@@ -37,6 +37,6 @@ export class GetTrackWithAuthorDto {
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
     this.status = getStatus(track, user);
-    this.label = new GetLabelDto(track.label) ?? null;
+    this.label = track.label ? new GetLabelDto(track.label) : null;
   }
 }
