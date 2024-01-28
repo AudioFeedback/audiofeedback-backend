@@ -1,15 +1,18 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InviteStatus, Prisma, User } from "@prisma/client";
+import bcrypt from "bcrypt";
 import { PrismaService } from "src/prisma.service";
 import { UserWithTrack } from "./dto/get-user-with-track.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { UpdateUserPasswordDto } from "./dto/update-user-password.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: Prisma.UserCreateInput) {
+    data.password = await bcrypt.hash(data.password, 10);
+
     return this.prisma.user.create({ data });
   }
 
@@ -83,13 +86,12 @@ export class UsersService {
       throw new NotFoundException(`You are not logged in`);
     }
 
-    const updatedUser = await this.prisma.user.update({
+    return this.prisma.user.update({
       where: {
         id: user.id,
       },
       data: updateUserDto,
     });
-    return updatedUser;
   }
 
   async updatePassword(
@@ -106,12 +108,16 @@ export class UsersService {
       throw new NotFoundException(`You are not logged in.`);
     }
 
-    const updatedUserPassword = await this.prisma.user.update({
+    updateUserPasswordDto.password = await bcrypt.hash(
+      updateUserPasswordDto.password,
+      10,
+    );
+
+    return this.prisma.user.update({
       where: {
         id: user.id,
       },
       data: updateUserPasswordDto,
     });
-    return updatedUserPassword;
   }
 }
