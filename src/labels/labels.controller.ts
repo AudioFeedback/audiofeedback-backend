@@ -58,7 +58,7 @@ export class LabelsController {
   @Get("invites")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.FEEDBACKGEVER)
+  @Roles(Role.FEEDBACKGEVER, Role.ADMIN)
   async getInvites(@Req() req: Request) {
     const labelMembers = await this.labelsService.getInvites(<User>req.user);
 
