@@ -138,7 +138,7 @@ export class LabelsController {
   @Patch(":id/accept")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.FEEDBACKGEVER)
+  @Roles(Role.FEEDBACKGEVER, Role.ADMIN)
   async acceptInvite(
     @Param("id") labelId: number,
     @Body() inviteUser: UpdateLabelMemberStatusDto,
@@ -189,7 +189,7 @@ export class LabelsController {
   @Patch(":id/decline")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Roles(Role.FEEDBACKGEVER)
+  @Roles(Role.FEEDBACKGEVER, Role.ADMIN)
   async declineInvite(
     @Param("id") labelId: number,
     @Body() inviteUser: UpdateLabelMemberStatusDto,
