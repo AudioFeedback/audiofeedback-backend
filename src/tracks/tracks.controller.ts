@@ -190,7 +190,7 @@ export class TracksController {
     const tracks = await this.tracksService.findAllProducer(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorDto(x, <User>req.user);
+      return new GetTrackWithAuthorDto(x, <User>req.user, Role.MUZIEKPRODUCER);
     });
   }
 
@@ -202,7 +202,7 @@ export class TracksController {
     const tracks = await this.tracksService.findAllReviewer(<User>req.user);
 
     return tracks.map((x) => {
-      return new GetTrackWithAuthorDto(x, <User>req.user);
+      return new GetTrackWithAuthorDto(x, <User>req.user, Role.FEEDBACKGEVER);
     });
   }
 

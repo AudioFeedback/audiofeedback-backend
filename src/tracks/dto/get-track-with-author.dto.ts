@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, Role, User } from "@prisma/client";
 import { TrackStatus } from "src/enums";
 import { GetLabelDto } from "src/labels/dto/get-label.dto";
 import { getStatus } from "src/labels/utils/utils";
@@ -31,12 +31,12 @@ export class GetTrackWithAuthorDto {
   status: TrackStatus[];
   label: GetLabelDto;
 
-  constructor(track: TrackWithAuthor, user: User) {
+  constructor(track: TrackWithAuthor, user: User, roleOverride?: Role) {
     this.id = track.id;
     this.title = track.title;
     this.genre = track.genre;
     this.author = new GetUserDto(track.author);
-    this.status = getStatus(track, user);
+    this.status = getStatus(track, user, roleOverride);
     this.label = track.label ? new GetLabelDto(track.label) : null;
   }
 }
