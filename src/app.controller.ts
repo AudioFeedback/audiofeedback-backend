@@ -1,13 +1,18 @@
-import { Controller, Get, Post, UseGuards, Request, Body } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiConsumes } from "@nestjs/swagger";
 import { AppService } from "./app.service";
-import { LocalAuthGuard } from "./auth/local-auth.guard";
 import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
-import { UpdateFeedbackDto } from "./feedback/dto/update-feedback.dto";
-import { UsersService } from "./users/users.service";
-import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 import { GetUserWithNotificationsDto } from "./users/dto/get-user-with-notifications.dto";
+import { UsersService } from "./users/users.service";
 
 @Controller()
 export class AppController {
@@ -16,6 +21,7 @@ export class AppController {
     private authService: AuthService,
     private userService: UsersService,
   ) {}
+
   @Get()
   hello() {
     return "🐳  🎀  𝒱𝑒𝓇𝓈𝒾𝑒 𝟤.0  🎀  🐳";
