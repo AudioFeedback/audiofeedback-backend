@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { importX509, jwtVerify } from "jose";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()
@@ -12,10 +13,7 @@ export class AuthService {
   async validateUser(username: string): Promise<any> {
     const user = await this.usersService.findOne({ username: username });
 
-    // const auth = await bcrypt.compare(pass, user.password);
-
     if (user) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { ...result } = user;
       return result;
     }
@@ -23,9 +21,28 @@ export class AuthService {
   }
 
   async login(user: string) {
-    const claims = this.jwtService.decode(user);
+    const publicKeys = await (
+      await fetch(
+        "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com",
+      )
+    ).json();
 
-    const signedUser = await this.usersService.findOne({ sub: claims.sub });
+    const decodedToken = await jwtVerify(
+      user,
+      async (header, _alg) => {
+        const x509Cert = publicKeys[header.kid];
+        return await importX509(x509Cert, "RS256");
+      },
+      {
+        issuer: `https://securetoken.google.com/${process.env.FIREBASE_PROJECT_ID}`,
+        audience: process.env.FIREBASE_PROJECT_ID,
+        algorithms: ["RS256"],
+      },
+    );
+
+    const signedUser = await this.usersService.findOne({
+      sub: decodedToken.payload.sub,
+    });
 
     const payload = { sub: signedUser.username, roles: signedUser.roles };
 
