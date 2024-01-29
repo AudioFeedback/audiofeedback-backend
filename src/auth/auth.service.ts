@@ -14,7 +14,6 @@ export class AuthService {
     const user = await this.usersService.findOne({ username: username });
 
     if (user) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { ...result } = user;
       return result;
     }
@@ -30,7 +29,7 @@ export class AuthService {
 
     const decodedToken = await jwtVerify(
       user,
-      async (header, _alg) => {
+      async (header) => {
         const x509Cert = publicKeys[header.kid];
         return await importX509(x509Cert, "RS256");
       },
