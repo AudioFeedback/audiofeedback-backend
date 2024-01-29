@@ -1,3 +1,4 @@
+import { fakerNL } from "@faker-js/faker";
 import {
   InviteStatus,
   Label,
@@ -6,8 +7,6 @@ import {
   TrackVersion,
   User,
 } from "@prisma/client";
-import bcrypt from "bcrypt";
-import { fakerNL } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
