@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
+import { Role, User } from "@prisma/client";
 import { createWriteStream, readFileSync, rmSync } from "fs";
+import * as mm from "music-metadata";
 import * as path from "path";
+import { PrismaService } from "src/prisma.service";
 import { v4 as uuidv4 } from "uuid";
 import { CreateTrackDto } from "./dto/create-track.dto";
-import { Role, User } from "@prisma/client";
-import * as mm from "music-metadata";
-import { UpdateTrackDto } from "./dto/update-track.dto";
 // import { UpdateTrackDto } from "./dto/update-track.dto";
 import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
 
 @Injectable()
 export class TracksService {
@@ -224,6 +224,64 @@ export class TracksService {
         },
       });
     }
+  }
+
+  async findAllProducer(user: User) {
+    return this.prisma.track.findMany({
+      include: {
+        label: true,
+        author: true,
+        reviewers: {
+          include: {
+            feedback: true,
+          },
+        },
+        trackVersions: {
+          include: {
+            feedback: {
+              where: {
+                isPublished: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        OR: [{ authorId: user.id }],
+      },
+    });
+  }
+
+  async findAllReviewer(user: User) {
+    return this.prisma.track.findMany({
+      include: {
+        label: true,
+        author: true,
+        reviewers: {
+          include: {
+            feedback: true,
+          },
+        },
+        trackVersions: {
+          include: {
+            feedback: {
+              where: {
+                user: {
+                  id: user.id,
+                },
+              },
+            },
+          },
+        },
+      },
+      where: {
+        reviewers: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+    });
   }
 
   findOne(id: number) {

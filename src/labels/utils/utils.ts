@@ -1,15 +1,18 @@
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { TrackStatus } from "src/enums";
 import { TrackWithReviewers } from "src/tracks/dto/get-track-with-reviewers.dto";
 
 export function getStatus(
   track: TrackWithReviewers,
   user: User,
+  roleOverride?: Role,
 ): TrackStatus[] {
   const trackStatus = [];
   const trackversion = track.trackVersions[track.trackVersions.length - 1];
 
-  if (user.roles.includes("ADMIN")) {
+  const roles = roleOverride ? roleOverride : user.roles;
+
+  if (roles.includes("ADMIN")) {
     if (trackversion.isReviewed) {
       trackStatus.push(TrackStatus.SEND);
     } else if (
@@ -39,7 +42,7 @@ export function getStatus(
     }
   }
 
-  if (user.roles.includes("FEEDBACKGEVER")) {
+  if (roles.includes("FEEDBACKGEVER")) {
     if (trackversion.feedback.length === 0) {
       trackStatus.push(TrackStatus.READY_TO_REVIEW);
     } else {
@@ -47,7 +50,7 @@ export function getStatus(
     }
   }
 
-  if (user.roles.includes("MUZIEKPRODUCER")) {
+  if (roles.includes("MUZIEKPRODUCER")) {
     if (trackversion.isReviewed) {
       trackStatus.push(TrackStatus.REVIEWED);
     } else {

@@ -1,44 +1,44 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
-  UseInterceptors,
-  UploadedFile,
-  Res,
+  Controller,
+  Delete,
+  Get,
   Header,
-  Req,
-  UseGuards,
   HttpException,
   HttpStatus,
+  Param,
   Patch,
-  Delete,
+  Post,
+  Req,
+  Res,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
-import { GetTrackDto } from "./dto/get-track.dto";
-import { TracksService } from "./tracks.service";
-import { CreateTrackDto } from "./dto/create-track.dto";
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Request } from "express";
-import { GetTrackWithAuthorDto } from "./dto/get-track-with-author.dto";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { Role, User } from "@prisma/client";
-import { Roles } from "src/auth/roles.decorator";
+import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
+import { GetUserDto } from "src/users/dto/get-user.dto";
+import { UsersService } from "src/users/users.service";
+import { CreateTrackDto } from "./dto/create-track.dto";
+import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
+import { GetReviewTrackDto } from "./dto/get-review-track.dto";
+import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
+import { GetTrackWithAuthorDto } from "./dto/get-track-with-author.dto";
+import { GetTrackWithLabelOrReviewersAndAuthor } from "./dto/get-track-with-label-or-reviewers-and.author.dto";
+import { GetTrackDto } from "./dto/get-track.dto";
+import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
+import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
+import { UpdateTrackDto } from "./dto/update-track.dto";
+import { TracksService } from "./tracks.service";
 import {
   TrackVersionData,
   TrackVersionsService,
 } from "./trackversions.service";
-import { GetTrackDeepDto } from "./dto/get-track-deep.dto";
-import { GetTrackVersionDto } from "./dto/get-trackversion.dto";
-import { CreateTrackVersionDto } from "./dto/create-trackversion.dto";
-import { GetReviewTrackDto } from "./dto/get-review-track.dto";
-import { UsersService } from "src/users/users.service";
-import { GetUserDto } from "src/users/dto/get-user.dto";
-import { UpdateTrackDto } from "./dto/update-track.dto";
-import { GetTrackWithLabelOrReviewersAndAuthor } from "./dto/get-track-with-label-or-reviewers-and.author.dto";
-import { UpdateTrackReviewersDto } from "./dto/update-track-reviewers.dto";
 
 @ApiTags("tracks")
 @Controller("tracks")
@@ -179,6 +179,30 @@ export class TracksController {
 
     return tracks.map((x) => {
       return new GetTrackWithAuthorDto(x, <User>req.user);
+    });
+  }
+
+  @Get("/producer")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.MUZIEKPRODUCER)
+  async findAllForProducer(@Req() req: Request) {
+    const tracks = await this.tracksService.findAllProducer(<User>req.user);
+
+    return tracks.map((x) => {
+      return new GetTrackWithAuthorDto(x, <User>req.user, Role.MUZIEKPRODUCER);
+    });
+  }
+
+  @Get("/reviewer")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Roles(Role.FEEDBACKGEVER)
+  async findAllForReviewer(@Req() req: Request) {
+    const tracks = await this.tracksService.findAllReviewer(<User>req.user);
+
+    return tracks.map((x) => {
+      return new GetTrackWithAuthorDto(x, <User>req.user, Role.FEEDBACKGEVER);
     });
   }
 
