@@ -1,8 +1,9 @@
-import { Controller, Get, Post, UseGuards, Request } from "@nestjs/common";
+import { Controller, Get, Post, UseGuards, Request, Body } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { LocalAuthGuard } from "./auth/local-auth.guard";
 import { AuthService } from "./auth/auth.service";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
+import { UpdateFeedbackDto } from "./feedback/dto/update-feedback.dto";
 import { UsersService } from "./users/users.service";
 import { ApiBearerAuth, ApiBody, ApiConsumes } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
@@ -20,20 +21,10 @@ export class AppController {
     return "🐳  🎀  𝒱𝑒𝓇𝓈𝒾𝑒 𝟤.0  🎀  🐳";
   }
 
-  @UseGuards(LocalAuthGuard)
   @ApiConsumes("application/json")
   @Post("auth/login")
-  @ApiBody({
-    schema: {
-      type: "object",
-      properties: {
-        username: { type: "string" },
-        password: { type: "string" },
-      },
-    },
-  })
-  async login(@Request() req): Promise<LoginDto> {
-    return this.authService.login(req.user);
+  async login(@Body() login: LoginDto): Promise<LoginDto> {
+    return this.authService.login(login.access_token);
   }
 
   @UseGuards(JwtAuthGuard)

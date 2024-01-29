@@ -263,9 +263,10 @@ async function createRandomUser(
   const data = {
     username: username ? username : fakerNL.internet.userName(),
     firstname: fakerNL.person.firstName(),
-    password: await bcrypt.hash("demo123", 10),
+    // password: await bcrypt.hash("demo123", 10),
     lastname: fakerNL.person.lastName(),
     roles: roles,
+    sub: crypto.randomUUID(),
   };
 
   return prisma.user.create({ data });

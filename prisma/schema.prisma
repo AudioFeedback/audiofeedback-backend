@@ -46,7 +46,7 @@ model User {
   username    String        @unique
   firstname   String
   lastname    String
-  password    String
+  sub         String        @unique
   roles       Role[]
   tracks      Track[]
   feedback    Feedback[]

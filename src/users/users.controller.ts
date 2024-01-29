@@ -5,7 +5,7 @@ import {
   Body,
   UseGuards,
   Patch,
-  Req,
+  Req, Param
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -76,5 +76,10 @@ export class UsersController {
   async getReviewers() {
     const reviewers = await this.usersService.getReviewers();
     return reviewers.map((x) => new GetUserDto(x));
+  }
+
+  @Get("/name-exists/:username")
+  async getNameExists(@Param("username") username: string,) {
+    return await this.usersService.getNameExists(username)
   }
 }
