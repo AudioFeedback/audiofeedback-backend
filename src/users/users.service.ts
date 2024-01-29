@@ -11,8 +11,6 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: Prisma.UserCreateInput) {
-    data.password = await bcrypt.hash(data.password, 10);
-
     return this.prisma.user.create({ data });
   }
 
@@ -119,5 +117,15 @@ export class UsersService {
       },
       data: updateUserPasswordDto,
     });
+  }
+
+  async getNameExists(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username: username,
+      },
+    });
+
+    return !!user ?? false;
   }
 }

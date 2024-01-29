@@ -7,9 +7,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   firstname: string;
   @IsNotEmpty()
-  password: string;
-  @IsNotEmpty()
   lastname: string;
+  @IsNotEmpty()
+  sub: string;
   @IsNotEmpty()
   roles: Role[];
 }

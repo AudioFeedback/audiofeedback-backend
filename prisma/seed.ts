@@ -1,3 +1,4 @@
+import { fakerNL } from "@faker-js/faker";
 import {
   InviteStatus,
   Label,
@@ -6,8 +7,6 @@ import {
   TrackVersion,
   User,
 } from "@prisma/client";
-import bcrypt from "bcrypt";
-import { fakerNL } from "@faker-js/faker";
 
 const prisma = new PrismaClient();
 
@@ -263,9 +262,10 @@ async function createRandomUser(
   const data = {
     username: username ? username : fakerNL.internet.userName(),
     firstname: fakerNL.person.firstName(),
-    password: await bcrypt.hash("demo123", 10),
+    // password: await bcrypt.hash("demo123", 10),
     lastname: fakerNL.person.lastName(),
     roles: roles,
+    sub: crypto.randomUUID(),
   };
 
   return prisma.user.create({ data });
