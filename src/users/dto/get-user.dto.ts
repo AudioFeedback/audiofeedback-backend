@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Role, User } from "@prisma/client";
 
 export class GetUserDto {
@@ -5,6 +6,13 @@ export class GetUserDto {
   username: string;
   firstname: string;
   lastname: string;
+  @ApiProperty({
+    type: "array",
+    items: {
+      type: "string",
+      enum: [Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN],
+    },
+  })
   roles: Role[];
 
   constructor(user: User) {

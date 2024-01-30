@@ -47,7 +47,7 @@ model User {
   firstname   String
   lastname    String
   sub         String        @unique
-  roles       Role[]
+  roles       Role[]        @default([])
   tracks      Track[]
   feedback    Feedback[]
   reviewable  Track[]       @relation("reviewer")

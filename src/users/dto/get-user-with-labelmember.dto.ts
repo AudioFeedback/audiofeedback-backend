@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Prisma, Role } from "@prisma/client";
 import { GetLabelMemberDto } from "src/labels/dto/get-labelmember.dto";
 
@@ -14,6 +15,13 @@ export class GetUserWithLabelMemberDto {
   firstname: string;
   lastname: string;
   username: string;
+  @ApiProperty({
+    type: "array",
+    items: {
+      type: "string",
+      enum: [Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN],
+    },
+  })
   roles: Role[];
   labelMember: GetLabelMemberDto[];
 

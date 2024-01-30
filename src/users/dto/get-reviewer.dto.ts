@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Feedback, Prisma, Role, TrackVersion } from "@prisma/client";
 
 const userWithFeedback = Prisma.validator<Prisma.UserDefaultArgs>()({
@@ -13,6 +14,13 @@ export class GetReviewerDto {
   username: string;
   firstname: string;
   lastname: string;
+  @ApiProperty({
+    type: "array",
+    items: {
+      type: "string",
+      enum: [Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN],
+    },
+  })
   roles: Role[];
   isReviewed: boolean;
 
