@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Prisma, Role } from "@prisma/client";
 import { GetFeedbackDto } from "src/feedback/dto/get-feedback.dto";
 import { GetTrackDto } from "src/tracks/dto/get-track.dto";
@@ -12,6 +13,13 @@ export class GetUserWithTrackDto {
   id: number;
   firstname: string;
   lastname: string;
+  @ApiProperty({
+    type: "array",
+    items: {
+      type: "string",
+      enum: [Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN],
+    },
+  })
   roles: Role[];
   tracks?: GetTrackDto[];
   feedback?: GetFeedbackDto[];

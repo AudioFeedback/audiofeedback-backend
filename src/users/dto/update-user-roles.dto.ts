@@ -2,16 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Role } from "@prisma/client";
 import { IsNotEmpty } from "class-validator";
 
-export class CreateUserDto {
-  @IsNotEmpty()
-  username: string;
-  @IsNotEmpty()
-  firstname: string;
-  @IsNotEmpty()
-  lastname: string;
-  @IsNotEmpty()
-  sub: string;
-  @IsNotEmpty()
+export class UpdateUserRolesDto {
   @ApiProperty({
     type: "array",
     items: {
@@ -19,5 +10,6 @@ export class CreateUserDto {
       enum: [Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER, Role.ADMIN],
     },
   })
+  @IsNotEmpty()
   roles: Role[];
 }

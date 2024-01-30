@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InviteStatus, Prisma, User } from "@prisma/client";
-import bcrypt from "bcrypt";
 import { PrismaService } from "src/prisma.service";
 import { UserWithTrack } from "./dto/get-user-with-track.dto";
-import { UpdateUserPasswordDto } from "./dto/update-user-password.dto";
+import { UpdateUserRolesDto } from "./dto/update-user-roles.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
@@ -92,10 +91,17 @@ export class UsersService {
     });
   }
 
-  async updatePassword(
-    user: User,
-    updateUserPasswordDto: UpdateUserPasswordDto,
-  ) {
+  async getNameExists(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username: username,
+      },
+    });
+
+    return !!user ?? false;
+  }
+
+  async updateRoles(user: User, updateUserRoles: UpdateUserRolesDto) {
     const existingUser = await this.prisma.user.findUnique({
       where: {
         id: user.id,
@@ -106,26 +112,11 @@ export class UsersService {
       throw new NotFoundException(`You are not logged in.`);
     }
 
-    updateUserPasswordDto.password = await bcrypt.hash(
-      updateUserPasswordDto.password,
-      10,
-    );
-
     return this.prisma.user.update({
       where: {
         id: user.id,
       },
-      data: updateUserPasswordDto,
+      data: updateUserRoles,
     });
-  }
-
-  async getNameExists(username: string) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        username: username,
-      },
-    });
-
-    return !!user ?? false;
   }
 }

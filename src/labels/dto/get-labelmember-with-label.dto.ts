@@ -1,6 +1,7 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Prisma } from "@prisma/client";
-import { GetLabelDto } from "./get-label.dto";
 import { InviteStatus } from "src/enums";
+import { GetLabelDto } from "./get-label.dto";
 
 const getLabelMemberWithLabel =
   Prisma.validator<Prisma.LabelMemberDefaultArgs>()({
@@ -13,6 +14,17 @@ export type LabelMemberWithLabel = Prisma.LabelMemberGetPayload<
 
 export class GetLabelMemberWithLabelDto {
   id: number;
+  @ApiProperty({
+    type: "array",
+    items: {
+      type: "string",
+      enum: [
+        InviteStatus.ACCEPTED,
+        InviteStatus.DECLINED,
+        InviteStatus.INVITED,
+      ],
+    },
+  })
   status: InviteStatus;
   label: GetLabelDto;
 

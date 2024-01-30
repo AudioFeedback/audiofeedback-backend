@@ -1,25 +1,26 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  UseGuards,
+  Param,
   Patch,
-  Req, Param
+  Post,
+  Req,
+  UseGuards,
 } from "@nestjs/common";
-import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Role, User } from "@prisma/client";
-import { GetUserWithTrackDto } from "./dto/get-user-with-track.dto";
-import { GetTrackDto } from "src/tracks/dto/get-track.dto";
-import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { RolesGuard } from "src/auth/roles.guard";
-import { Roles } from "src/auth/roles.decorator";
-import { GetUserDto } from "./dto/get-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { Request } from "express";
-import { UpdateUserPasswordDto } from "./dto/update-user-password.dto";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { Roles } from "src/auth/roles.decorator";
+import { RolesGuard } from "src/auth/roles.guard";
+import { GetTrackDto } from "src/tracks/dto/get-track.dto";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { GetUserWithTrackDto } from "./dto/get-user-with-track.dto";
+import { GetUserDto } from "./dto/get-user.dto";
+import { UpdateUserRolesDto } from "./dto/update-user-roles.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { UsersService } from "./users.service";
 
 @ApiTags("users")
 @Controller("users")
@@ -55,18 +56,15 @@ export class UsersController {
     return await this.usersService.update(updateUserDto, <User>req.user);
   }
 
-  @Patch("Password")
+  @Patch("roles")
   @Roles(Role.ADMIN, Role.MUZIEKPRODUCER, Role.FEEDBACKGEVER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  async updatePassword(
-    @Body() updateUserPassword: UpdateUserPasswordDto,
+  async updateUserRoles(
+    @Body() updateUserRoles: UpdateUserRolesDto,
     @Req() req: Request,
   ) {
-    return await this.usersService.updatePassword(
-      <User>req.user,
-      updateUserPassword,
-    );
+    return await this.usersService.updateRoles(<User>req.user, updateUserRoles);
   }
 
   @Get("reviewers")
@@ -79,7 +77,7 @@ export class UsersController {
   }
 
   @Get("/name-exists/:username")
-  async getNameExists(@Param("username") username: string,) {
-    return await this.usersService.getNameExists(username)
+  async getNameExists(@Param("username") username: string) {
+    return await this.usersService.getNameExists(username);
   }
 }
